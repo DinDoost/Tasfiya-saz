@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>خرج خوراکه کامل</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{
+  --blue:#1769e0; --pink:#ed1670; --green:#20a94b; --orange:#ff8a00;
+  --purple:#7040c7; --red:#e22b25; --ink:#111827; --cream:#fffdf6;
+}
+body{
+  margin:0; font-family:Tahoma,"Vazirmatn","Noto Naskh Arabic",sans-serif;
+  background:linear-gradient(135deg,#eef6ff,#fff4fb 45%,#f4fff4);
+  color:var(--ink); padding:12px; font-weight:800;
+  overscroll-behavior-y: contain;
+}
+button,input,select{font:inherit; font-weight:900;}
+
+.app{max-width:880px;margin:auto}
+.top{
+  background:linear-gradient(135deg,#fff,#fff9ef);
+  border:3px solid #1c9b66;border-radius:26px;padding:16px 14px 14px;
+  box-shadow:0 8px 28px #00000018; margin-bottom:12px; position:relative; overflow:hidden;
+}
+.top:before,.top:after{content:"🍲";position:absolute;font-size:45px;opacity:.75;top:8px}
+.top:before{left:10px}.top:after{right:10px}
+
+h1{text-align:center;color:#d92323;font-size:34px;margin:5px 0 15px;text-shadow:2px 2px #ffd8d8;font-weight:1000; position:relative; z-index:5;}
+
+.total-expense-box{
+  background:#fff; border:2px solid #c8d8f0; border-radius:16px; padding:12px; margin-bottom:12px;
+  display:flex; flex-direction:column; gap:6px; box-shadow:0 4px 10px #0001;
+}
+.total-expense-box label{font-size:15px; color:#1769e0; font-weight:1000;}
+.total-expense-row{display:flex; align-items:center; gap:10px;}
+.total-expense-row input{flex:1; font-size:20px; font-weight:1000; color:#d92323; direction:ltr; text-align:right;}
+.total-expense-row select{width:110px; font-size:16px; background:#eef5ff; cursor:pointer;}
+
+.panel{ background:#ffffffec;border:2px solid #d8e5ff;border-radius:20px; padding:16px;box-shadow:0 6px 20px #00000012;margin-bottom:12px }
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid .wide{grid-column:1/-1}
+label{font-size:14px;font-weight:1000;color:#1f2937;margin:0 0 6px;display:block}
+input,select{ width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:12px 10px; background:#fff;outline:none;color:#111827; font-size:16px; font-weight:900; }
+input:focus,select:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
+
+.date-input-group { position: relative; }
+.date-display-btn {
+  width: 100%; background: #fff; border: 2px solid #dbe5f4; border-radius: 12px;
+  padding: 12px 10px; font-size: 16px; font-weight: 900; color: #111827; text-align: right;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+}
+.date-display-btn:active { background: #f0f4ff; }
+
+.btn{ border:0;border-radius:13px;padding:12px 14px;font-weight:1000;font-size:16px;cursor:pointer; box-shadow:0 4px 10px #00000018; transition:.12s transform,.12s filter }
+.btn:active{transform:scale(.95)}
+.add{background:linear-gradient(135deg,#18a34a,#07883b);color:white;width:100%;margin-top:12px; font-size:18px;}
+.image{background:linear-gradient(135deg,#1769e0,#0b4fb7);color:white;flex:1; font-size:18px;}
+.clear{background:#f2f5fa;color:#111827; border:2px solid #dbe5f4;}
+.actions{display:flex;gap:10px;margin-top:14px;position:relative;z-index:10;}
+.count{font-weight:1000;color:#1a5dc6;font-size:16px; margin-bottom:10px;}
+
+.table-wrap{overflow-x:auto;border-radius:15px;border:1px solid #d8e1ee}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:700px;background:white}
+th,td{padding:12px 8px;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:900; font-size:14px; color:#111827;}
+th{color:#fff; font-size:14px; font-weight:1000;}
+th:nth-child(1){background:var(--purple)} 
+th:nth-child(2){background:var(--pink)}
+th:nth-child(3){background:var(--green)} 
+th:nth-child(4){background:var(--blue)}
+th:nth-child(5){background:var(--orange)} 
+th:nth-child(6){background:#16885b} 
+th:nth-child(7){background:#e22b25}
+td{background:#f8fbff}
+tr:nth-child(even) td{background:#fff3fa}
+
+.num{font-weight:1000; font-size:16px; color:var(--purple);}
+.money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:15px; color:#0b4fb7;}
+.edit{background:#1769e0;color:white;padding:6px 8px;border-radius:8px;border:0; cursor:pointer; font-weight:1000; font-size:13px;}
+.del{background:#ef3340;color:white;padding:6px 8px;border-radius:8px;border:0;margin-right:4px; cursor:pointer; font-weight:1000; font-size:13px;}
+
+.total-sum-box{
+  margin-top:16px;border:4px solid #e52c20;border-radius:20px;
+  background:linear-gradient(135deg,#fff36b,#ffc928);
+  padding:16px;text-align:center;box-shadow:0 6px 20px #0002
+}
+.total-sum-box small{display:block;color:#8e1710;font-weight:1000;font-size:16px}
+.total-sum-box strong{display:block;color:#a40000;font-size:26px; font-weight:1000; margin-top:4px}
+.empty{text-align:center;padding:25px;color:#4b5563;font-weight:900; font-size:16px;}
+
+.notes-box{margin-top:12px}
+textarea{width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:10px;background:#fff;outline:none;color:#111827;resize:vertical;font-family:inherit;font-size:16px; font-weight:900;}
+textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
+
+.invoice-card{ position:fixed;left:-10000px;top:0;width:950px;background:#fff; }
+#capture{ width:950px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
+.capture-title{font-size:42px;text-align:center;color:#d92323;font-weight:1000;margin:3px 0 5px}
+.capture-sub{text-align:center;font-size:20px;color:#163f9c;font-weight:1000;margin-bottom:15px;direction:ltr;unicode-bidi:plaintext;}
+.capture-table{width:100%;margin:0 auto;border-collapse:separate;border-spacing:4px;table-layout:fixed}
+.capture-table th{font-size:17px;padding:10px 4px;font-weight:1000}
+.capture-table td{font-size:19px;padding:10px 4px;font-weight:1000; color:#111827;}
+.capture-total{margin-top:20px;border:5px solid #e32b22;border-radius:22px;background:#ffd12b;text-align:center;padding:16px;font-size:28px;font-weight:1000;color:#9d0808}
+.capture-footer{margin-top:18px;border:4px solid #16885b;border-radius:20px;overflow:hidden;background:#fff;direction:rtl; padding:16px; font-size:20px; line-height:1.6; font-weight:1000;}
+
+.persian-calendar{position:fixed;z-index:100000;display:none;top:70px;left:50%;transform:translateX(-50%);width:min(94vw,360px);background:#fff;border:3px solid #1c9b66;border-radius:20px;padding:14px;box-shadow:0 12px 35px #0003;direction:rtl}
+.persian-calendar.show{display:block}
+.pc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pc-head button{border:0;background:#eef5ff;border-radius:10px;padding:8px 12px;font-size:18px;font-weight:1000;cursor:pointer}
+.pc-title{font-size:20px;font-weight:1000;color:#1769e0}
+.pc-week,.pc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.pc-week div{font-size:13px;font-weight:1000;color:#374151;padding:5px 0}
+.pc-days button{border:0;background:#f7faff;border-radius:9px;padding:9px 2px;font-weight:1000;font-size:16px; color:#111827;cursor:pointer}
+.pc-days button.selected{background:#1c9b66!important;color:#fff!important;position:relative}
+.pc-days button.empty{background:transparent;cursor:default}
+.pc-actions{display:flex;gap:8px;margin-top:10px}
+.pc-actions button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:1000;font-size:16px;cursor:pointer}
+.pc-cancel{background:#f2f5fa; color:#111827;}
+
+.save-success{
+  position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:#00000066; backdrop-filter:blur(4px);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease;
+}
+.save-success.show{opacity:1;visibility:visible;pointer-events:auto;}
+.save-success-check{
+  width:110px;height:110px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:#20a94b;color:#fff;border:6px solid #fff;
+  box-shadow:0 10px 30px #0006;font-size:75px;font-weight:1000;line-height:1;
+}
+.save-success-text{
+  margin-top:18px;padding:10px 20px;border-radius:14px;background:#fff;color:#16885b;
+  font-size:20px;font-weight:1000;box-shadow:0 6px 20px #0004;
+}
+
+@media(max-width:620px){
+  body{padding:8px} h1{font-size:26px}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="top">
+    <h1>خرج خوراکه کامل</h1>
+    
+    <div class="total-expense-box">
+      <label>مبلغ کل خرج مغازه (قابل تغییر لحظه‌ای):</label>
+      <div class="total-expense-row">
+        <input id="totalExpenseInput" type="text" inputmode="numeric" placeholder="مثلاً 120,000,000" oninput="formatExpenseInput()">
+        <select id="currencySelect" onchange="calculateCosts(); saveData();">
+          <option value="تومان">تومان</option>
+          <option value="افغانی">افغانی</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="form-grid">
+      <div class="wide">
+        <label>نام شخص</label>
+        <input id="personName" placeholder="مثلاً احمد جان">
+      </div>
+      <div>
+        <label>تاریخ شروع حضور</label>
+        <div class="date-input-group">
+          <button type="button" class="date-display-btn" id="startDateBtn" onclick="openCalendar('start')">
+            <span id="startDateText">انتخاب تاریخ</span> 📅
+          </button>
+        </div>
+      </div>
+      <div>
+        <label>تاریخ ختم حضور</label>
+        <div class="date-input-group">
+          <button type="button" class="date-display-btn" id="endDateBtn" onclick="openCalendar('end')">
+            <span id="endDateText">انتخاب تاریخ</span> 📅
+          </button>
+        </div>
+      </div>
+    </div>
+    <button class="btn add" id="addPersonBtn" type="button" onclick="addOrUpdatePerson()">＋ افزودن شخص به لیست</button>
+  </div>
+
+  <div class="panel">
+    <div class="count" id="personCount">۰ نفر در لیست</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>شماره</th>
+            <th>نام شخص</th>
+            <th>تاریخ شروع</th>
+            <th>تاریخ ختم</th>
+            <th>تعداد روز</th>
+            <th>خرج هر روز</th>
+            <th>جمع خرج کل هر شخص</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody id="personsRows"></tbody>
+      </table>
+      <div class="empty" id="emptyMsg">هنوز شخصی اضافه نشده است.</div>
+    </div>
+
+    <div class="total-sum-box">
+      <small>مجموع کل روزها و هزینه کل خوراک</small>
+      <strong id="totalSummaryText">۰ روز | ۰ تومان</strong>
+    </div>
+
+    <div class="notes-box">
+      <label for="notesInput">توضیحات فاکتور</label>
+      <textarea id="notesInput" rows="3" placeholder="مثلاً: هزینه خوراکه افراد اتاق..." oninput="saveData()"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn image" type="button" onclick="exportImage()">▣ ذخیره عکس فاکتور</button>
+      <button class="btn clear" type="button" onclick="clearAllData()">پاک‌کردن همه</button>
+    </div>
+  </div>
+</div>
+
+<div class="invoice-card"><div id="capture"></div></div>
+
+<div id="persianCalendar" class="persian-calendar" aria-hidden="true">
+  <div class="pc-head">
+    <button type="button" onclick="changeMonth(-1)">‹</button>
+    <div class="pc-title" id="pcTitle"></div>
+    <button type="button" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="pc-week"><div>ش</div><div>ی</div><div>د</div><div>س</div><div>چ</div><div>پ</div><div>ج</div></div>
+  <div class="pc-days" id="pcDays"></div>
+  <div class="pc-actions">
+    <button type="button" class="pc-cancel" onclick="closeCalendar()">انصراف</button>
+  </div>
+</div>
+
+<div id="saveSuccess" class="save-success" aria-hidden="true">
+  <div class="save-success-check">✓</div>
+  <div class="save-success-text" id="saveSuccessText">عکس فاکتور با موفقیت ذخیره شد</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let persons = [];
+let editIndex = -1;
+
+let activeDateField = null;
+
+// پیش‌فرض تقویم: سال جاری شمسی و ماه اول (حمل)
+let pcYear = 1405;
+let pcMonth = 1; 
+let pcDay = 1;
+
+let startDateObj = null;
+let endDateObj = null;
+const pMonths=['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت'];
+
+function fmt(n){ return new Intl.NumberFormat('fa-IR').format(Math.round(Number(n)||0)); }
+const parseMoney = v => Math.max(0, Number(String(v||'').replace(/[^0-9.]/g,'')) || 0);
+
+function formatExpenseInput(){
+  const input = $('totalExpenseInput');
+  const raw = parseMoney(input.value);
+  input.value = raw ? raw.toLocaleString('en-US') : '';
+  calculateCosts();
+  saveData();
+}
+
+function getCurrency(){ return $('currencySelect').value; }
+
+function jalaliToDays(y, m, d){
+  let days = (y - 1400) * 365 + Math.floor((y - 1400) / 4);
+  for(let i=1; i<m; i++){
+    if(i<=6) days += 31;
+    else if(i<=11) days += 30;
+    else days += 29;
+  }
+  return days + d;
+}
+
+function calculateDaysBetween(sy, sm, sd, ey, em, ed){
+  const startDays = jalaliToDays(sy, sm, sd);
+  const endDays = jalaliToDays(ey, em, ed);
+  const diff = endDays - startDays + 1;
+  return diff > 0 ? diff : 0;
+}
+
+function openCalendar(field){
+  activeDateField = field;
+  const targetDate = field === 'start' ? startDateObj : endDateObj;
+  if(targetDate){
+    pcYear = targetDate[0]; pcMonth = targetDate[1]; pcDay = targetDate[2];
+  } else {
+    // پیش‌فرض شروع از اول برج اول (حمل) سال ۱۴۰۵ یا سال جاری
+    pcYear = 1405;
+    pcMonth = 1;
+    pcDay = 1;
+  }
+  document.body.classList.add('calendar-open');
+  renderCalendar();
+  $('persianCalendar').classList.add('show');
+}
+
+function closeCalendar(){
+  document.body.classList.remove('calendar-open');
+  $('persianCalendar').classList.remove('show');
+}
+
+function changeMonth(dir){
+  pcMonth += dir;
+  if(pcMonth < 1){ pcMonth = 12; pcYear--; }
+  if(pcMonth > 12){ pcMonth = 1; pcYear++; }
+  renderCalendar();
+}
+
+function getMonthDaysCount(y, m){
+  if(m <= 6) return 31;
+  if(m <= 11) return 30;
+  return 29;
+}
+
+function renderCalendar(){
+  $('pcTitle').textContent = pMonths[pcMonth-1] + ' ' + fmt(pcYear);
+  const daysInMonth = getMonthDaysCount(pcYear, pcMonth);
+  
+  // محاسبه دقیق روز هفته برای تقویم شمسی
+  const totalDaysSample = jalaliToDays(pcYear, pcMonth, 1);
+  const startDayOffset = (totalDaysSample + 2) % 7; 
+
+  const box = $('pcDays');
+  box.innerHTML = '';
+
+  for(let i=0; i<startDayOffset; i++){
+    const b = document.createElement('button');
+    b.className = 'empty'; b.disabled = true;
+    box.appendChild(b);
+  }
+
+  const currentSelected = activeDateField === 'start' ? startDateObj : endDateObj;
+
+  for(let d=1; d<=daysInMonth; d++){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = fmt(d);
+
+    if(currentSelected && currentSelected[0]===pcYear && currentSelected[1]===pcMonth && currentSelected[2]===d){
+      b.classList.add('selected');
+    }
+
+    b.onclick = () => {
+      if(activeDateField === 'start'){
+        startDateObj = [pcYear, pcMonth, d];
+        $('startDateText').textContent = `${pcYear}/${String(pcMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+      } else {
+        endDateObj = [pcYear, pcMonth, d];
+        $('endDateText').textContent = `${pcYear}/${String(pcMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+      }
+      closeCalendar();
+    };
+    box.appendChild(b);
+  }
+}
+
+function addOrUpdatePerson(){
+  const name = $('personName').value.trim();
+  if(!name){ alert('لطفاً نام شخص را وارد کنید.'); $('personName').focus(); return; }
+  if(!startDateObj){ alert('لطفاً تاریخ شروع حضور را انتخاب کنید.'); return; }
+  if(!endDateObj){ alert('لطفاً تاریخ ختم حضور را انتخاب کنید.'); return; }
+
+  const days = calculateDaysBetween(startDateObj[0], startDateObj[1], startDateObj[2], endDateObj[0], endDateObj[1], endDateObj[2]);
+  if(days <= 0){ alert('تاریخ ختم باید بعد یا مساوی تاریخ شروع باشد.'); return; }
+
+  const personObj = {
+    name,
+    startDate: [...startDateObj],
+    endDate: [...endDateObj],
+    days,
+    share: 0,
+    dailyRate: 0
+  };
+
+  if(editIndex >= 0){
+    persons[editIndex] = personObj;
+    editIndex = -1;
+    $('addPersonBtn').textContent = '＋ افزودن شخص به لیست';
+  } else {
+    persons.push(personObj);
+  }
+
+  $('personName').value = '';
+  startDateObj = null; endDateObj = null;
+  $('startDateText').textContent = 'انتخاب تاریخ';
+  $('endDateText').textContent = 'انتخاب تاریخ';
+
+  calculateCosts();
+  render();
+  saveData();
+}
+
+function calculateCosts(){
+  const totalExpense = parseMoney($('totalExpenseInput').value);
+  const totalDays = persons.reduce((sum, p) => sum + p.days, 0);
+
+  if(totalDays > 0 && totalExpense > 0){
+    const costPerDayTotal = totalExpense / totalDays;
+    persons.forEach(p => {
+      p.dailyRate = costPerDayTotal;
+      p.share = p.days * costPerDayTotal;
+    });
+  } else {
+    persons.forEach(p => {
+      p.share = 0;
+      p.dailyRate = 0;
+    });
+  }
+  render();
+}
+
+function render(){
+  const tbody = $('personsRows');
+  tbody.innerHTML = '';
+  $('emptyMsg').style.display = persons.length ? 'none' : 'block';
+
+  let totalDaysSum = 0;
+
+  persons.forEach((p, i) => {
+    totalDaysSum += p.days;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="num">${fmt(i+1)}</td>
+      <td><b>${p.name}</b></td>
+      <td class="num">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
+      <td class="num">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
+      <td class="num">${fmt(p.days)} روز</td>
+      <td class="money">${fmt(p.dailyRate)} ${getCurrency()}</td>
+      <td class="money" style="color:#d92323;">${fmt(p.share)} ${getCurrency()}</td>
+      <td>
+        <button class="edit" onclick="editPerson(${i})" type="button">ویرایش</button>
+        <button class="del" onclick="deletePerson(${i})" type="button">حذف</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  $('personCount').textContent = fmt(persons.length) + ' نفر در لیست';
+  const totalExpense = parseMoney($('totalExpenseInput').value);$('totalSummaryText').textContent = fmt(totalDaysSum) + ' روز حضور | ' + fmt(totalExpense) + ' ' + getCurrency();
+}
+
+window.editPerson = function(i){
+  const p = persons[i];
+  $('personName').value = p.name;
+  startDateObj = [...p.startDate];
+  endDateObj = [...p.endDate];
+  $('startDateText').textContent = `${startDateObj[0]}/${String(startDateObj[1]).padStart(2,'0')}/${String(startDateObj[2]).padStart(2,'0')}`;
+  $('endDateText').textContent = `${endDateObj[0]}/${String(endDateObj[1]).padStart(2,'0')}/${String(endDateObj[2]).padStart(2,'0')}`;
+  editIndex = i;
+  $('addPersonBtn').textContent = '✓ ذخیره ویرایش شخص';
+  window.scrollTo({top: 150, behavior: 'smooth'});
+};
+
+window.deletePerson = function(i){
+  if(confirm('این شخص از لیست حذف شود؟')){
+    persons.splice(i, 1);
+    calculateCosts();
+    render();
+    saveData();
+  }
+};
+
+function clearAllData(){
+  if(confirm('تمام اطلاعات، افراد و هزینه‌ها پاک شوند؟')){
+    persons = [];
+    $('totalExpenseInput').value = '';$('notesInput').value = '';
+    startDateObj = null; endDateObj = null;
+    $('startDateText').textContent = 'انتخاب تاریخ';
+    $('endDateText').textContent = 'انتخاب تاریخ';
+    localStorage.removeItem('foodCalcData3');
+    render();
+  }
+}
+
+function saveData(){
+  const data = {
+    totalExpense: $('totalExpenseInput').value,
+    currency: getCurrency(),
+    notes: $('notesInput').value,
+    persons
+  };
+  localStorage.setItem('foodCalcData3', JSON.stringify(data));
+}
+
+function loadData(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('foodCalcData3') || '{}');
+    if(saved.totalExpense) $('totalExpenseInput').value = saved.totalExpense;
+    if(saved.currency) $('currencySelect').value = saved.currency;
+    if(saved.notes) $('notesInput').value = saved.notes;
+    if(Array.isArray(saved.persons)) persons = saved.persons;
+  }catch(e){ persons = []; }
+  calculateCosts();
+}
+
+function buildCaptureHTML(){
+  const totalExpenseStr = $('totalExpenseInput').value || '۰';
+  const currency = getCurrency();
+  const notes = $('notesInput').value.trim() ?$('notesInput').value.replace(/\n/g, '<br>') : 'خرج خوراکه کامل';
+  const todayFa = '۱۴۰۵/۰۱/۰۱';
+
+  let html = `
+    <div class="capture-title">خرج خوراکه کامل</div>
+    <div class="capture-sub">مبلغ کل خرج مغازه: ${totalExpenseStr} ${currency}</div>
+    
+    <table class="capture-table">
+      <thead>
+        <tr style="background:#7040c7; color:#fff;">
+          <th>نام شخص</th>
+          <th>تاریخ شروع</th>
+          <th>تاریخ ختم</th>
+          <th>تعداد روز</th>
+          <th>خرج هر روز</th>
+          <th>جمع خرج کل هر شخص (${currency})</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  let totalDays = 0;
+  persons.forEach(p => {
+    totalDays += p.days;
+    html += `
+      <tr>
+        <td style="font-weight:1000">${p.name}</td>
+        <td>${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
+        <td>${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
+        <td>${fmt(p.days)} روز</td>
+        <td style="color:#0b4fb7">${fmt(p.dailyRate)}</td>
+        <td style="color:#d92323; font-weight:1000">${fmt(p.share)}</td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+    
+    <div class="capture-total">
+      مجموع کل خرج مغازه: ${totalExpenseStr} ${currency} (مجموع کل روزهای حضور: ${fmt(totalDays)} روز)
+    </div>
+
+    <div class="capture-footer">
+      <b>توضیحات:</b><br>${notes}
+    </div>
+  `;
+
+  $('capture').innerHTML = html;
+}
+
+function exportImage(){
+  if(!persons.length){ alert('ابتدا حداقل یک شخص به لیست اضافه کنید.'); return; }
+  buildCaptureHTML();
+
+  html2canvas($('capture'), {scale: 2.5, useCORS: true, backgroundColor: '#fff', logging: false}).then(canvas => {
+    const a = document.createElement('a');
+    a.download = 'food-invoice-' + Date.now() + '.png';
+    a.href = canvas.toDataURL('image/png', 1.0);
+    a.click();
+
+    const success = $('saveSuccess');
+    success.classList.add('show');
+    success.setAttribute('aria-hidden', 'false');
+    setTimeout(() => {
+      success.classList.remove('show');
+      success.setAttribute('aria-hidden', 'true');
+    }, 1800);
+  }).catch(err => {
+    console.error(err);
+    alert('خطا در ذخیره عکس فاکتور.');
+  });
+}
+
+loadData();
+</script>
+</body>
+</html>
