@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>خرج خوراکه کامل</title>
+<title>محاسبه اشتراک مصارف</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 *{box-sizing:border-box}
@@ -19,13 +19,13 @@ body{
 }
 button,input,select{font:inherit; font-weight:900;}
 
-.app{max-width:880px;margin:auto}
+.app{max-width:920px;margin:auto}
 .top{
   background:linear-gradient(135deg,#fff,#fff9ef);
   border:3px solid #1c9b66;border-radius:26px;padding:16px 14px 14px;
   box-shadow:0 8px 28px #00000018; margin-bottom:12px; position:relative; overflow:hidden;
 }
-.top:before,.top:after{content:"🍲";position:absolute;font-size:45px;opacity:.75;top:8px}
+.top:before,.top:after{content:"📊";position:absolute;font-size:45px;opacity:.75;top:8px}
 .top:before{left:10px}.top:after{right:10px}
 
 h1{text-align:center;color:#d92323;font-size:34px;margin:5px 0 5px;text-shadow:2px 2px #ffd8d8;font-weight:1000; position:relative; z-index:5;}
@@ -64,23 +64,27 @@ input:focus,select:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 .count{font-weight:1000;color:#1a5dc6;font-size:16px; margin-bottom:10px;}
 
 .table-wrap{overflow-x:auto;border-radius:15px;border:1px solid #d8e1ee}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:700px;background:white}
-th,td{padding:12px 8px;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:900; font-size:14px; color:#111827;}
-th{color:#fff; font-size:14px; font-weight:1000;}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px;background:white}
+th,td{padding:12px 6px;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:900; font-size:13px; color:#111827;}
+th{color:#fff; font-size:13px; font-weight:1000;}
 th:nth-child(1){background:var(--purple)} 
 th:nth-child(2){background:var(--pink)}
-th:nth-child(3){background:var(--green)} 
-th:nth-child(4){background:var(--blue)}
-th:nth-child(5){background:var(--orange)} 
-th:nth-child(6){background:#16885b} 
-th:nth-child(7){background:#e22b25}
+th:nth-child(3){background:var(--blue)}
+th:nth-child(4){background:var(--orange)}
+th:nth-child(5){background:#b83280} /* رنگ جدا برای ستون ماه */
+th:nth-child(6){background:var(--green)}  /* رنگ جدا برای ستون روز */
+th:nth-child(7){background:#16885b} 
+th:nth-child(8){background:#e22b25}
 td{background:#f8fbff}
-tr:nth-child(even) td{background:#fff3fa}
+tr:nth-child(2) td, tr:nth-child(even) td{background:#fff3fa}
 
-.num{font-weight:1000; font-size:16px; color:var(--purple); direction:ltr; text-align:center;}
-.money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:15px; color:#0b4fb7; text-align:center;}
-.edit{background:#1769e0;color:white;padding:6px 8px;border-radius:8px;border:0; cursor:pointer; font-weight:1000; font-size:13px;}
-.del{background:#ef3340;color:white;padding:6px 8px;border-radius:8px;border:0;margin-right:4px; cursor:pointer; font-weight:1000; font-size:13px;}
+.num{font-weight:1000; font-size:15px; color:var(--purple); direction:ltr; text-align:center;}
+.money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:14px; color:#0b4fb7; text-align:center;}
+.month-col{background:#fff0f8 !important; color:#b83280 !important; font-weight:1000;}
+.day-col{background:#f0fff4 !important; color:#16885b !important; font-weight:1000;}
+
+.edit{background:#1769e0;color:white;padding:6px 8px;border-radius:8px;border:0; cursor:pointer; font-weight:1000; font-size:12px;}
+.del{background:#ef3340;color:white;padding:6px 8px;border-radius:8px;border:0;margin-right:2px; cursor:pointer; font-weight:1000; font-size:12px;}
 
 .total-sum-box{
   margin-top:16px;border:4px solid #e52c20;border-radius:20px;
@@ -95,28 +99,25 @@ tr:nth-child(even) td{background:#fff3fa}
 textarea{width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:10px;background:#fff;outline:none;color:#111827;resize:vertical;font-family:inherit;font-size:16px; font-weight:900;}
 textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 
-.invoice-card{ position:fixed;left:-10000px;top:0;width:950px;background:#fff; }
-#capture{ width:950px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
+.invoice-card{ position:fixed;left:-10000px;top:0;width:1000px;background:#fff; }
+#capture{ width:1000px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
 .capture-title{font-size:42px;text-align:center;color:#d92323;font-weight:1000;margin:3px 0 15px}
 .capture-table{width:100%;margin:0 auto;border-collapse:separate;border-spacing:4px;table-layout:fixed}
-.capture-table th{font-size:17px;padding:10px 4px;font-weight:1000}
-.capture-table td{font-size:19px;padding:10px 4px;font-weight:1000; color:#111827;}
+.capture-table th{font-size:16px;padding:10px 4px;font-weight:1000}
+.capture-table td{font-size:18px;padding:10px 4px;font-weight:1000; color:#111827;}
 .capture-total{margin-top:20px;border:5px solid #e32b22;border-radius:22px;background:#ffd12b;text-align:center;padding:16px;font-size:28px;font-weight:1000;color:#9d0808;direction:ltr;unicode-bidi:plaintext;}
 .capture-footer{margin-top:18px;border:4px solid #16885b;border-radius:20px;overflow:hidden;background:#fff;direction:rtl; padding:16px; font-size:20px; line-height:1.6; font-weight:1000;}
 
-.persian-calendar{position:fixed;z-index:100000;display:none;top:70px;left:50%;transform:translateX(-50%);width:min(94vw,360px);background:#fff;border:3px solid #1c9b66;border-radius:20px;padding:14px;box-shadow:0 12px 35px #0003;direction:rtl}
+.persian-calendar{position:fixed;z-index:100000;display:none;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,340px);background:#fff;border:3px solid #1c9b66;border-radius:22px;padding:18px;box-shadow:0 12px 35px #0004;direction:rtl}
 .persian-calendar.show{display:block}
-.pc-head{display:flex;align-items:center;justify-content:between;margin-bottom:10px}
-.pc-head button{border:0;background:#eef5ff;border-radius:10px;padding:8px 12px;font-size:18px;font-weight:1000;cursor:pointer}
-.pc-title{font-size:20px;font-weight:1000;color:#1769e0}
-.pc-week,.pc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
-.pc-week div{font-size:13px;font-weight:1000;color:#374151;padding:5px 0}
-.pc-days button{border:0;background:#f7faff;border-radius:9px;padding:9px 2px;font-weight:1000;font-size:16px; color:#111827;cursor:pointer}
-.pc-days button.selected{background:#1c9b66!important;color:#fff!important;position:relative}
-.pc-days button.empty{background:transparent;cursor:default}
-.pc-actions{display:flex;gap:8px;margin-top:10px}
-.pc-actions button{flex:1;border:0;border-radius:10px;padding:10px;font-weight:1000;font-size:16px;cursor:pointer}
-.pc-cancel{background:#f2f5fa; color:#111827;}
+.pc-title{font-size:20px;font-weight:1000;color:#1769e0;text-align:center;margin-bottom:14px}
+.pc-form-group{margin-bottom:10px}
+.pc-form-group label{font-size:13px;color:#374151;margin-bottom:4px}
+.pc-form-group input{text-align:center;direction:ltr;font-size:18px;font-weight:1000;}
+.pc-actions{display:flex;gap:8px;margin-top:14px}
+.pc-actions button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:1000;font-size:16px;cursor:pointer}
+.pc-confirm{background:#20a94b;color:#fff;}
+.pc-cancel{background:#f2f5fa;color:#111827;}
 
 .save-success{
   position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
@@ -144,7 +145,7 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 
 <div class="app">
   <div class="top">
-    <h1>خرج خوراکه کامل</h1>
+    <h1>محاسبه اشتراک مصارف</h1>
   </div>
 
   <div class="panel">
@@ -183,9 +184,10 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
             <th>نام شخص</th>
             <th>تاریخ شروع</th>
             <th>تاریخ ختم</th>
+            <th>تعداد ماه</th>
             <th>تعداد روز</th>
-            <th>خرج هر روز (تومان)</th>
-            <th>جمع خرج هر شخص (تومان)</th>
+            <th>سهم هر روز (تومان)</th>
+            <th>جمع سهم شخص (تومان)</th>
             <th>عملیات</th>
           </tr>
         </thead>
@@ -195,13 +197,13 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
     </div>
 
     <div class="total-sum-box" role="button" tabindex="0" onclick="openExpenseModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openExpenseModal();}">
-      <small>مجموع کل خرج خوراکه (برای تغییر مبلغ کل اینجا کلیک کنید)</small>
+      <small>مجموع کل مصارف (برای تغییر مبلغ کل اینجا کلیک کنید)</small>
       <strong id="totalSummaryText">0 تومان</strong>
     </div>
 
     <div class="notes-box">
       <label for="notesInput">توضیحات فاکتور</label>
-      <textarea id="notesInput" rows="3" placeholder="مثلاً: هزینه خوراکه افراد اتاق..." oninput="handleNotesInput()"></textarea>
+      <textarea id="notesInput" rows="3" placeholder="مثلاً: هزینه مصارف مشترک اتاق..." oninput="handleNotesInput()"></textarea>
     </div>
 
     <div class="actions">
@@ -214,21 +216,28 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 <div class="invoice-card"><div id="capture"></div></div>
 
 <div id="persianCalendar" class="persian-calendar" aria-hidden="true">
-  <div class="pc-head">
-    <button type="button" onclick="changeMonth(-1)">‹</button>
-    <div class="pc-title" id="pcTitle"></div>
-    <button type="button" onclick="changeMonth(1)">›</button>
+  <div class="pc-title" id="pcTitleModal">انتخاب تاریخ</div>
+  <div class="pc-form-group">
+    <label>سال (مثلاً 1405)</label>
+    <input id="pcYearInput" type="text" inputmode="numeric" placeholder="1405">
   </div>
-  <div class="pc-week"><div>ش</div><div>ی</div><div>د</div><div>س</div><div>چ</div><div>پ</div><div>ج</div></div>
-  <div class="pc-days" id="pcDays"></div>
+  <div class="pc-form-group">
+    <label>ماه (عدد 1 تا 12)</label>
+    <input id="pcMonthInput" type="text" inputmode="numeric" placeholder="1">
+  </div>
+  <div class="pc-form-group">
+    <label>روز (عدد 1 تا 31)</label>
+    <input id="pcDayInput" type="text" inputmode="numeric" placeholder="1">
+  </div>
   <div class="pc-actions">
+    <button type="button" class="pc-confirm" onclick="confirmCalendarDate()">تأیید تاریخ</button>
     <button type="button" class="pc-cancel" onclick="closeCalendar()">انصراف</button>
   </div>
 </div>
 
 <div id="expenseModal" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeExpenseModal()">
   <div class="expense-dialog" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
-    <h3 id="expenseModalTitle">ثبت مبلغ کل خرج خوراکه</h3>
+    <h3 id="expenseModalTitle">ثبت مبلغ کل مصارف</h3>
     <input id="expenseModalInput" type="text" inputmode="numeric" placeholder="مثلاً 120000000">
     <div class="expense-modal-actions">
       <button type="button" class="expense-confirm" onclick="confirmExpense()">تأیید</button>
@@ -246,16 +255,10 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 const $ = id => document.getElementById(id);
 let persons = [];
 let editIndex = -1;
-
 let activeDateField = null;
-
-let pcYear = 1405;
-let pcMonth = 1; 
-let pcDay = 1;
 
 let startDateObj = null;
 let endDateObj = null;
-const pMonths=['حمل','ثور','جوزا','سرطان','اسد','سنبله','میزان','عقرب','قوس','جدی','دلو','حوت'];
 
 function fmt(n){ return Number(Math.round(Number(n)||0)).toLocaleString('en-US'); }
 const parseMoney = v => Math.max(0, Number(String(v||'').replace(/[^0-9.]/g,'')) || 0);
@@ -298,78 +301,111 @@ function calculateDaysBetween(sy, sm, sd, ey, em, ed){
   return diff > 0 ? diff : 0;
 }
 
+// محاسبه تفکیک ماه و روز دقیق بر اساس تقویم جلالی
+function calculateMonthsAndDays(sy, sm, sd, ey, em, ed){
+  let totalDays = calculateDaysBetween(sy, sm, sd, ey, em, ed);
+  if(totalDays <= 0) return { months: 0, days: 0, totalDays: 0 };
+
+  let y1 = sy, m1 = sm, d1 = sd;
+  let months = 0;
+
+  while(true){
+    // طول ماه فعلی خورشیدی
+    let daysInCurrentMonth = 31;
+    if(m1 > 6 && m1 <= 11) daysInCurrentMonth = 30;
+    else if(m1 === 12) {
+      // بررسی سال کبیسه جلالی
+      let leap = ((y1 - 974) % 33 % 4 === 0); // فرمول تقریب سال کبیسه جلالی
+      daysInCurrentMonth = leap ? 30 : 29;
+    }
+
+    // اگر یک ماه کامل یا بیشتر باقی مانده باشد
+    if(y1 < ey || (y1 === ey && m1 < em) || (y1 === ey && m1 === em && d1 <= ed)){
+      // بررسی اینکه آیا تا تاریخ پایان حداقل یک ماه کامل فاصله هست
+      let nextY = m1 === 12 ? y1 + 1 : y1;
+      let nextM = m1 === 12 ? 1 : m1 + 1;
+      let nextD = d1;
+      
+      let nextDays = jalaliToDays(nextY, nextM, nextD);
+      let endTotal = jalaliToDays(ey, em, ed) + 1;
+
+      if(endTotal >= nextDays){
+        months++;
+        y1 = nextY;
+        m1 = nextM;
+        d1 = nextD;
+      } else {
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+
+  // روزهای باقی‌مانده پس از کسر ماه‌های کامل
+  let days = calculateDaysBetween(y1, m1, d1, ey, em, ed);
+  if(days < 0) days = 0;
+
+  return { months, days, totalDays };
+}
+
+function getDefaultJalaliDate(){
+  const gDate = new Date();
+  let gY = gDate.getFullYear();
+  let gM = gDate.getMonth() + 1;
+  let gD = gDate.getDate();
+  
+  let jY = gY - 621;
+  let jM = 1;
+  let jD = 1;
+  if (gM < 3 || (gM === 3 && gD < 21)) {
+    jY -= 1;
+    jM = 10;
+    jD = 10;
+  } else {
+    jM = 6;
+    jD = 27;
+  }
+  return [jY, jM, jD];
+}
+
 function openCalendar(field){
   activeDateField = field;
   const targetDate = field === 'start' ? startDateObj : endDateObj;
-  if(targetDate){
-    pcYear = targetDate[0]; pcMonth = targetDate[1]; pcDay = targetDate[2];
-  } else {
-    pcYear = 1405;
-    pcMonth = 1;
-    pcDay = 1;
+  
+  let dObj = targetDate;
+  if(!dObj){
+    dObj = getDefaultJalaliDate();
   }
-  document.body.classList.add('calendar-open');
-  renderCalendar();
+  
+  $('pcYearInput').value = dObj[0];$('pcMonthInput').value = dObj[1];
+  $('pcDayInput').value = dObj[2];$('pcTitleModal').textContent = field === 'start' ? 'انتخاب تاریخ شروع' : 'انتخاب تاریخ ختم';
   $('persianCalendar').classList.add('show');
+  setTimeout(() => $('pcDayInput').focus(), 50);
 }
 
 function closeCalendar(){
-  document.body.classList.remove('calendar-open');
   $('persianCalendar').classList.remove('show');
 }
 
-function changeMonth(dir){
-  pcMonth += dir;
-  if(pcMonth < 1){ pcMonth = 12; pcYear--; }
-  if(pcMonth > 12){ pcMonth = 1; pcYear++; }
-  renderCalendar();
-}
-
-function getMonthDaysCount(y, m){
-  if(m <= 6) return 31;
-  if(m <= 11) return 30;
-  return 29;
-}
-
-function renderCalendar(){
-  $('pcTitle').textContent = pMonths[pcMonth-1] + ' ' + fmt(pcYear);
-  const daysInMonth = getMonthDaysCount(pcYear, pcMonth);
+function confirmCalendarDate(){
+  const y = parseInt($('pcYearInput').value) || 1405;
+  const m = parseInt($('pcMonthInput').value) || 1;
+  const d = parseInt($('pcDayInput').value) || 1;
   
-  const totalDaysSample = jalaliToDays(pcYear, pcMonth, 1);
-  const startDayOffset = (totalDaysSample + 2) % 7; 
+  if(m < 1 || m > 12){ alert('ماه باید بین ۱ تا ۱۲ باشد.'); return; }
+  if(d < 1 || d > 31){ alert('روز باید بین ۱ تا ۳۱ باشد.'); return; }
 
-  const box = $('pcDays');
-  box.innerHTML = '';
+  const formattedStr = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
 
-  for(let i=0; i<startDayOffset; i++){
-    const b = document.createElement('button');
-    b.className = 'empty'; b.disabled = true;
-    box.appendChild(b);
+  if(activeDateField === 'start'){
+    startDateObj = [y, m, d];
+    $('startDateText').textContent = formattedStr;
+  } else {
+    endDateObj = [y, m, d];
+    $('endDateText').textContent = formattedStr;
   }
-
-  const currentSelected = activeDateField === 'start' ? startDateObj : endDateObj;
-
-  for(let d=1; d<=daysInMonth; d++){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = fmt(d);
-
-    if(currentSelected && currentSelected[0]===pcYear && currentSelected[1]===pcMonth && currentSelected[2]===d){
-      b.classList.add('selected');
-    }
-
-    b.onclick = () => {
-      if(activeDateField === 'start'){
-        startDateObj = [pcYear, pcMonth, d];
-        $('startDateText').textContent = `${pcYear}/${String(pcMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
-      } else {
-        endDateObj = [pcYear, pcMonth, d];
-        $('endDateText').textContent = `${pcYear}/${String(pcMonth).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
-      }
-      closeCalendar();
-    };
-    box.appendChild(b);
-  }
+  closeCalendar();
 }
 
 function addOrUpdatePerson(){
@@ -378,14 +414,16 @@ function addOrUpdatePerson(){
   if(!startDateObj){ alert('لطفاً تاریخ شروع حضور را انتخاب کنید.'); return; }
   if(!endDateObj){ alert('لطفاً تاریخ ختم حضور را انتخاب کنید.'); return; }
 
-  const days = calculateDaysBetween(startDateObj[0], startDateObj[1], startDateObj[2], endDateObj[0], endDateObj[1], endDateObj[2]);
-  if(days <= 0){ alert('تاریخ ختم باید بعد یا مساوی تاریخ شروع باشد.'); return; }
+  const calc = calculateMonthsAndDays(startDateObj[0], startDateObj[1], startDateObj[2], endDateObj[0], endDateObj[1], endDateObj[2]);
+  if(calc.totalDays <= 0){ alert('تاریخ ختم باید بعد یا مساوی تاریخ شروع باشد.'); return; }
 
   const personObj = {
     name,
     startDate: [...startDateObj],
     endDate: [...endDateObj],
-    days,
+    months: calc.months,
+    days: calc.days,
+    totalDays: calc.totalDays,
     share: 0,
     dailyRate: 0
   };
@@ -410,13 +448,13 @@ function addOrUpdatePerson(){
 
 function calculateCosts(){
   const totalExpense = getTotalExpense();
-  const totalDays = persons.reduce((sum, p) => sum + p.days, 0);
+  const totalAllDays = persons.reduce((sum, p) => sum + p.totalDays, 0);
 
-  if(totalDays > 0 && totalExpense > 0){
-    const costPerDayTotal = totalExpense / totalDays;
+  if(totalAllDays > 0 && totalExpense > 0){
+    const costPerDayTotal = totalExpense / totalAllDays;
     persons.forEach(p => {
       p.dailyRate = costPerDayTotal;
-      p.share = p.days * costPerDayTotal;
+      p.share = p.totalDays * costPerDayTotal;
     });
   } else {
     persons.forEach(p => {
@@ -439,7 +477,8 @@ function render(){
       <td><b>${p.name}</b></td>
       <td class="num">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
       <td class="num">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-      <td class="num">${fmt(p.days)}</td>
+      <td class="month-col">${fmt(p.months)} ماه</td>
+      <td class="day-col">${fmt(p.days)} روز</td>
       <td class="money">${fmt(p.dailyRate)}</td>
       <td class="money" style="color:#d92323;">${fmt(p.share)}</td>
       <td>
@@ -484,7 +523,7 @@ function clearAllData(){
     startDateObj = null; endDateObj = null;
     $('startDateText').textContent = 'انتخاب تاریخ';
     $('endDateText').textContent = 'انتخاب تاریخ';
-    localStorage.removeItem('foodCalcData3');
+    localStorage.removeItem('foodCalcData4');
     render();
     calculateCosts();
   }
@@ -500,15 +539,25 @@ function saveData(){
     notes: $('notesInput').value,
     persons
   };
-  localStorage.setItem('foodCalcData3', JSON.stringify(data));
+  localStorage.setItem('foodCalcData4', JSON.stringify(data));
 }
 
 function loadData(){
   try{
-    const saved = JSON.parse(localStorage.getItem('foodCalcData3') || '{}');
+    const saved = JSON.parse(localStorage.getItem('foodCalcData4') || '{}');
     if(saved.totalExpense !== undefined) localStorage.setItem('foodCalcExpense', String(parseMoney(saved.totalExpense)));
     if(saved.notes !== undefined) $('notesInput').value = saved.notes;
-    if(Array.isArray(saved.persons)) persons = saved.persons;
+    if(Array.isArray(saved.persons)) {
+      persons = saved.persons.map(p => {
+        if(p.months === undefined || p.totalDays === undefined){
+          let calc = calculateMonthsAndDays(p.startDate[0], p.startDate[1], p.startDate[2], p.endDate[0], p.endDate[1], p.endDate[2]);
+          p.months = calc.months;
+          p.days = calc.days;
+          p.totalDays = calc.totalDays;
+        }
+        return p;
+      });
+    }
   }catch(e){ persons = []; }
   calculateCosts();
 }
@@ -525,7 +574,7 @@ function buildCaptureHTML(){
   const notes = notesText.replace(/\n/g, '<br>');
 
   let html = `
-    <div class="capture-title">خرج خوراکه کامل</div>
+    <div class="capture-title">محاسبه اشتراک مصارف</div>
     
     <table class="capture-table">
       <thead>
@@ -533,9 +582,10 @@ function buildCaptureHTML(){
           <th>نام شخص</th>
           <th>تاریخ شروع</th>
           <th>تاریخ ختم</th>
-          <th>تعداد روز</th>
-          <th>خرج هر روز (تومان)</th>
-          <th>جمع خرج هر شخص (تومان)</th>
+          <th style="background:#b83280;">تعداد ماه</th>
+          <th style="background:#20a94b;">تعداد روز</th>
+          <th>سهم هر روز (تومان)</th>
+          <th>جمع سهم شخص (تومان)</th>
         </tr>
       </thead>
       <tbody>
@@ -547,7 +597,8 @@ function buildCaptureHTML(){
         <td style="font-weight:1000">${p.name}</td>
         <td style="direction:ltr; text-align:center;">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
         <td style="direction:ltr; text-align:center;">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-        <td style="direction:ltr; text-align:center;">${fmt(p.days)}</td>
+        <td style="background:#fff0f8; color:#b83280; font-weight:1000; text-align:center;">${fmt(p.months)} ماه</td>
+        <td style="background:#f0fff4; color:#16885b; font-weight:1000; text-align:center;">${fmt(p.days)} روز</td>
         <td class="money" style="color:#0b4fb7">${fmt(p.dailyRate)}</td>
         <td class="money" style="color:#d92323; font-weight:1000">${fmt(p.share)}</td>
       </tr>
@@ -559,7 +610,7 @@ function buildCaptureHTML(){
     </table>
     
     <div class="capture-total">
-      مجموع کل خرج خوراکه: ${totalExpenseStr} تومان
+      مجموع کل مصارف: ${totalExpenseStr} تومان
     </div>
 
     <div class="capture-footer">
@@ -576,7 +627,7 @@ function exportImage(){
 
   html2canvas($('capture'), {scale: 2.5, useCORS: true, backgroundColor: '#fff', logging: false}).then(canvas => {
     const a = document.createElement('a');
-    a.download = 'food-invoice-' + Date.now() + '.png';
+    a.download = 'expense-invoice-' + Date.now() + '.png';
     a.href = canvas.toDataURL('image/png', 1.0);
     a.click();
 
