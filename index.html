@@ -19,7 +19,7 @@ body{
 }
 button,input,select{font:inherit; font-weight:900;}
 
-.app{max-width:920px;margin:auto}
+.app{max-width:940px;margin:auto}
 .top{
   background:linear-gradient(135deg,#fff,#fff9ef);
   border:3px solid #1c9b66;border-radius:26px;padding:16px 14px 14px;
@@ -64,24 +64,53 @@ input:focus,select:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 .count{font-weight:1000;color:#1a5dc6;font-size:16px; margin-bottom:10px;}
 
 .table-wrap{overflow-x:auto;border-radius:15px;border:1px solid #d8e1ee}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px;background:white}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:780px;background:white}
 th,td{padding:12px 6px;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:900; font-size:13px; color:#111827;}
 th{color:#fff; font-size:13px; font-weight:1000;}
 th:nth-child(1){background:var(--purple)} 
 th:nth-child(2){background:var(--pink)}
 th:nth-child(3){background:var(--blue)}
 th:nth-child(4){background:var(--orange)}
-th:nth-child(5){background:#b83280} /* رنگ جدا برای ستون ماه */
-th:nth-child(6){background:var(--green)}  /* رنگ جدا برای ستون روز */
-th:nth-child(7){background:#16885b} 
+th:nth-child(5){background:#d63384} /* هدر ماه */
+th:nth-child(6){background:#198754}  /* هدر روز */
+th:nth-child(7){background:#0b4fb7} 
 th:nth-child(8){background:#e22b25}
 td{background:#f8fbff}
-tr:nth-child(2) td, tr:nth-child(even) td{background:#fff3fa}
+tr:nth-child(even) td{background:#fff3fa}
 
 .num{font-weight:1000; font-size:15px; color:var(--purple); direction:ltr; text-align:center;}
 .money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:14px; color:#0b4fb7; text-align:center;}
-.month-col{background:#fff0f8 !important; color:#b83280 !important; font-weight:1000;}
-.day-col{background:#f0fff4 !important; color:#16885b !important; font-weight:1000;}
+
+/* استایل دایره‌های بزرگتر با رنگ پر شده */
+.month-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 65px;
+  height: 42px;
+  padding: 0 10px;
+  background: #fce8f3;
+  border: 2px solid #d63384;
+  border-radius: 21px;
+  color: #b02a6b;
+  font-weight: 1000;
+  font-size: 14px;
+}
+
+.day-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 65px;
+  height: 42px;
+  padding: 0 10px;
+  background: #e8f8f0;
+  border: 2px solid #198754;
+  border-radius: 21px;
+  color: #146c43;
+  font-weight: 1000;
+  font-size: 14px;
+}
 
 .edit{background:#1769e0;color:white;padding:6px 8px;border-radius:8px;border:0; cursor:pointer; font-weight:1000; font-size:12px;}
 .del{background:#ef3340;color:white;padding:6px 8px;border-radius:8px;border:0;margin-right:2px; cursor:pointer; font-weight:1000; font-size:12px;}
@@ -99,8 +128,8 @@ tr:nth-child(2) td, tr:nth-child(even) td{background:#fff3fa}
 textarea{width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:10px;background:#fff;outline:none;color:#111827;resize:vertical;font-family:inherit;font-size:16px; font-weight:900;}
 textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 
-.invoice-card{ position:fixed;left:-10000px;top:0;width:1000px;background:#fff; }
-#capture{ width:1000px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
+.invoice-card{ position:fixed;left:-10000px;top:0;width:1050px;background:#fff; }
+#capture{ width:1050px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
 .capture-title{font-size:42px;text-align:center;color:#d92323;font-weight:1000;margin:3px 0 15px}
 .capture-table{width:100%;margin:0 auto;border-collapse:separate;border-spacing:4px;table-layout:fixed}
 .capture-table th{font-size:16px;padding:10px 4px;font-weight:1000}
@@ -301,7 +330,6 @@ function calculateDaysBetween(sy, sm, sd, ey, em, ed){
   return diff > 0 ? diff : 0;
 }
 
-// محاسبه تفکیک ماه و روز دقیق بر اساس تقویم جلالی
 function calculateMonthsAndDays(sy, sm, sd, ey, em, ed){
   let totalDays = calculateDaysBetween(sy, sm, sd, ey, em, ed);
   if(totalDays <= 0) return { months: 0, days: 0, totalDays: 0 };
@@ -310,18 +338,14 @@ function calculateMonthsAndDays(sy, sm, sd, ey, em, ed){
   let months = 0;
 
   while(true){
-    // طول ماه فعلی خورشیدی
     let daysInCurrentMonth = 31;
     if(m1 > 6 && m1 <= 11) daysInCurrentMonth = 30;
     else if(m1 === 12) {
-      // بررسی سال کبیسه جلالی
-      let leap = ((y1 - 974) % 33 % 4 === 0); // فرمول تقریب سال کبیسه جلالی
+      let leap = ((y1 - 974) % 33 % 4 === 0);
       daysInCurrentMonth = leap ? 30 : 29;
     }
 
-    // اگر یک ماه کامل یا بیشتر باقی مانده باشد
     if(y1 < ey || (y1 === ey && m1 < em) || (y1 === ey && m1 === em && d1 <= ed)){
-      // بررسی اینکه آیا تا تاریخ پایان حداقل یک ماه کامل فاصله هست
       let nextY = m1 === 12 ? y1 + 1 : y1;
       let nextM = m1 === 12 ? 1 : m1 + 1;
       let nextD = d1;
@@ -342,7 +366,6 @@ function calculateMonthsAndDays(sy, sm, sd, ey, em, ed){
     }
   }
 
-  // روزهای باقی‌مانده پس از کسر ماه‌های کامل
   let days = calculateDaysBetween(y1, m1, d1, ey, em, ed);
   if(days < 0) days = 0;
 
@@ -477,8 +500,8 @@ function render(){
       <td><b>${p.name}</b></td>
       <td class="num">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
       <td class="num">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-      <td class="month-col">${fmt(p.months)} ماه</td>
-      <td class="day-col">${fmt(p.days)} روز</td>
+      <td><span class="month-badge">${fmt(p.months)} ماه</span></td>
+      <td><span class="day-badge">${fmt(p.days)} روز</span></td>
       <td class="money">${fmt(p.dailyRate)}</td>
       <td class="money" style="color:#d92323;">${fmt(p.share)}</td>
       <td>
@@ -523,7 +546,7 @@ function clearAllData(){
     startDateObj = null; endDateObj = null;
     $('startDateText').textContent = 'انتخاب تاریخ';
     $('endDateText').textContent = 'انتخاب تاریخ';
-    localStorage.removeItem('foodCalcData4');
+    localStorage.removeItem('foodCalcData5');
     render();
     calculateCosts();
   }
@@ -539,12 +562,12 @@ function saveData(){
     notes: $('notesInput').value,
     persons
   };
-  localStorage.setItem('foodCalcData4', JSON.stringify(data));
+  localStorage.setItem('foodCalcData5', JSON.stringify(data));
 }
 
 function loadData(){
   try{
-    const saved = JSON.parse(localStorage.getItem('foodCalcData4') || '{}');
+    const saved = JSON.parse(localStorage.getItem('foodCalcData5') || '{}');
     if(saved.totalExpense !== undefined) localStorage.setItem('foodCalcExpense', String(parseMoney(saved.totalExpense)));
     if(saved.notes !== undefined) $('notesInput').value = saved.notes;
     if(Array.isArray(saved.persons)) {
@@ -582,8 +605,8 @@ function buildCaptureHTML(){
           <th>نام شخص</th>
           <th>تاریخ شروع</th>
           <th>تاریخ ختم</th>
-          <th style="background:#b83280;">تعداد ماه</th>
-          <th style="background:#20a94b;">تعداد روز</th>
+          <th style="background:#d63384;">تعداد ماه</th>
+          <th style="background:#198754;">تعداد روز</th>
           <th>سهم هر روز (تومان)</th>
           <th>جمع سهم شخص (تومان)</th>
         </tr>
@@ -597,8 +620,8 @@ function buildCaptureHTML(){
         <td style="font-weight:1000">${p.name}</td>
         <td style="direction:ltr; text-align:center;">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
         <td style="direction:ltr; text-align:center;">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-        <td style="background:#fff0f8; color:#b83280; font-weight:1000; text-align:center;">${fmt(p.months)} ماه</td>
-        <td style="background:#f0fff4; color:#16885b; font-weight:1000; text-align:center;">${fmt(p.days)} روز</td>
+        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;height:42px;padding:0 10px;background:#fce8f3;border:2px solid #d63384;border-radius:21px;color:#b02a6b;font-weight:1000;font-size:15px;">${fmt(p.months)} ماه</span></td>
+        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;height:42px;padding:0 10px;background:#e8f8f0;border:2px solid #198754;border-radius:21px;color:#146c43;font-weight:1000;font-size:15px;">${fmt(p.days)} روز</span></td>
         <td class="money" style="color:#0b4fb7">${fmt(p.dailyRate)}</td>
         <td class="money" style="color:#d92323; font-weight:1000">${fmt(p.share)}</td>
       </tr>
