@@ -20,9 +20,9 @@ body{
 button,input,select{font:inherit; font-weight:900;}
 
 .app{max-width:940px;margin:auto}
-.top{
+.top{position:relative;
   background:linear-gradient(135deg,#fff,#fff9ef);
-  border:3px solid #1c9b66;border-radius:26px;padding:16px 14px 14px;
+  border:3px solid #1c9b66;border-radius:26px;padding:48px 14px 14px;
   box-shadow:0 8px 28px #00000018; margin-bottom:12px; position:relative; overflow:hidden;
 }
 .top:before,.top:after{content:"📊";position:absolute;font-size:45px;opacity:.75;top:8px}
@@ -60,6 +60,21 @@ input:focus,select:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 .add{background:linear-gradient(135deg,#18a34a,#07883b);color:white;width:100%;margin-top:12px; font-size:18px;}
 .image{background:linear-gradient(135deg,#1769e0,#0b4fb7);color:white;flex:1; font-size:18px;}
 .clear{background:#f2f5fa;color:#111827; border:2px solid #dbe5f4;}
+.save-invoice{background:#7040c7;color:#fff;flex:1;font-size:18px;}
+.retrieve-invoice{background:#ed1670;color:#fff;flex:1;font-size:18px;}
+.invoice-manager-dialog{width:min(94vw,560px);max-height:86vh;overflow:auto;}
+.invoice-list{display:flex;flex-direction:column;gap:9px;max-height:52vh;overflow:auto;}
+.invoice-item{border:2px solid #dbe5f4;border-radius:14px;padding:10px;background:#f8fbff;}
+.invoice-item-title{font-weight:1000;color:#1769e0;margin-bottom:7px;}
+.invoice-datetime{display:flex;flex-direction:column;gap:2px;margin-top:4px;line-height:1.45;direction:ltr;text-align:right;font-weight:900;}
+.invoice-date{display:block;}
+.invoice-time{display:block;font-size:12px;color:#667085;}
+
+.invoice-item-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.invoice-item-actions button{border:0;border-radius:9px;padding:7px 9px;font-weight:1000;cursor:pointer;color:#fff;}
+.invoice-open{background:#1769e0}.invoice-copy{background:#7040c7}.invoice-photo{background:#198754}.invoice-export{background:#ff8a00}.invoice-delete{background:#e22b25}
+.invoice-import{margin-top:12px;padding-top:12px;border-top:2px dashed #dbe5f4;}
+.import-btn{width:100%;background:#20a94b;color:#fff;}
 .actions{display:flex;gap:10px;margin-top:14px;position:relative;z-index:10;}
 .count{font-weight:1000;color:#1a5dc6;font-size:16px; margin-bottom:10px;}
 
@@ -132,8 +147,8 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 #capture{ width:1050px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
 .capture-title{font-size:42px;text-align:center;color:#d92323;font-weight:1000;margin:3px 0 15px}
 .capture-table{width:100%;margin:0 auto;border-collapse:separate;border-spacing:4px;table-layout:fixed}
-.capture-table th{font-size:15px;padding:9px 3px;font-weight:1000}
-.capture-table td{font-size:17px;padding:9px 3px;font-weight:1000; color:#111827;}
+.capture-table th{font-size:16px;padding:10px 4px;font-weight:1000}
+.capture-table td{font-size:18px;padding:10px 4px;font-weight:1000; color:#111827;}
 .capture-total{margin-top:20px;border:5px solid #e32b22;border-radius:22px;background:#ffd12b;text-align:center;padding:16px;font-size:28px;font-weight:1000;color:#9d0808;direction:ltr;unicode-bidi:plaintext;}
 .capture-footer{margin-top:18px;border:4px solid #16885b;border-radius:20px;overflow:hidden;background:#fff;direction:rtl; padding:16px; font-size:20px; line-height:1.6; font-weight:1000;}
 
@@ -168,12 +183,17 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
   body{padding:8px} h1{font-size:26px}
   .form-grid{grid-template-columns:1fr}
 }
+
+.code-btn{position:absolute;left:50%;transform:translateX(-50%);top:10px;border:0;border-radius:9px;background:#1769e0;color:#fff;padding:6px 12px;font-size:13px;font-weight:1000;cursor:pointer;}
+.code-btn.active{background:#7040c7;}
+@media(max-width:620px){.code-btn{left:50%;transform:translateX(-50%);top:8px;padding:5px 9px;font-size:12px;}}
 </style>
 </head>
 <body>
 
 <div class="app">
   <div class="top">
+    <button type="button" class="code-btn" id="invoiceCodeBtn" onclick="setInvoiceCode()">کود</button>
     <h1>محاسبه اشتراک مصارف</h1>
   </div>
 
@@ -237,6 +257,8 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 
     <div class="actions">
       <button class="btn image" type="button" onclick="exportImage()">▣ ذخیره عکس فاکتور</button>
+      <button class="btn save-invoice" type="button" onclick="saveInvoiceRecord()">💾 ثبت</button>
+      <button class="btn retrieve-invoice" type="button" onclick="openInvoiceManager()">↻ بازیابی</button>
       <button class="btn clear" type="button" onclick="clearAllData()">پاک‌کردن همه</button>
     </div>
   </div>
@@ -264,6 +286,19 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
   </div>
 </div>
 
+<div id="codeModal" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeCodeModal()">
+  <div class="expense-dialog" role="dialog" aria-modal="true" aria-labelledby="codeModalTitle">
+    <h3 id="codeModalTitle">ثبت کود فاکتور</h3>
+    <input id="invoiceCodeInput" type="text" inputmode="numeric" maxlength="3"
+           placeholder="123" autocomplete="off" dir="ltr"
+           style="font-family:Arial,sans-serif;letter-spacing:3px;">
+    <div class="expense-modal-actions">
+      <button type="button" class="expense-confirm" onclick="confirmInvoiceCode()">تأیید</button>
+      <button type="button" class="expense-cancel" onclick="closeCodeModal()">انصراف</button>
+    </div>
+  </div>
+</div>
+
 <div id="expenseModal" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeExpenseModal()">
   <div class="expense-dialog" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
     <h3 id="expenseModalTitle">ثبت مبلغ کل مصارف</h3>
@@ -271,6 +306,20 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
     <div class="expense-modal-actions">
       <button type="button" class="expense-confirm" onclick="confirmExpense()">تأیید</button>
       <button type="button" class="expense-cancel" onclick="closeExpenseModal()">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div id="invoiceManager" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeInvoiceManager()">
+  <div class="expense-dialog invoice-manager-dialog" role="dialog" aria-modal="true">
+    <h3>بازیابی فاکتورها</h3>
+    <div id="invoiceList" class="invoice-list"></div>
+    <div class="invoice-import">
+      <button type="button" class="btn import-btn" onclick="document.getElementById('invoiceFileInput').click()">＋ آوردن کپی از جای دیگر</button>
+      <input id="invoiceFileInput" type="file" accept=".json,application/json" style="display:none" onchange="importInvoiceFile(event)">
+    </div>
+    <div class="expense-modal-actions">
+      <button type="button" class="expense-cancel" onclick="closeInvoiceManager()">بستن</button>
     </div>
   </div>
 </div>
@@ -283,6 +332,8 @@ textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
 <script>
 const $ = id => document.getElementById(id);
 let persons = [];
+let invoiceCode = localStorage.getItem('foodCalcInvoiceCode') || '';
+
 let editIndex = -1;
 let activeDateField = null;
 
@@ -465,6 +516,7 @@ function addOrUpdatePerson(){
   $('endDateText').textContent = 'انتخاب تاریخ';
 
   calculateCosts();
+  updateInvoiceCodeButton();
   render();
   saveData();
 }
@@ -596,13 +648,15 @@ function buildCaptureHTML(){
   const notesText = rawNotes ? rawNotes + ' ✅' : '✅';
   const notes = notesText.replace(/\n/g, '<br>');
 
+  const codeTitle = invoiceCode ? `<div style="text-align:center;margin:-2px 0 12px;font-size:26px;font-weight:1000;color:#16885b;direction:rtl;">کود: <span dir="ltr">${toEnglishDigits(invoiceCode)}</span></div>` : '';
+
   let html = `
     <div class="capture-title">محاسبه اشتراک مصارف</div>
-    
+    ${codeTitle}
     <table class="capture-table">
       <thead>
         <tr style="background:#7040c7; color:#fff;">
-          <th style="background:#7040c7; width:70px;">شماره</th>
+          <th style="width:70px;">شماره</th>
           <th>نام شخص</th>
           <th>تاریخ شروع</th>
           <th>تاریخ ختم</th>
@@ -618,7 +672,7 @@ function buildCaptureHTML(){
   persons.forEach((p, i) => {
     html += `
       <tr>
-        <td style="font-weight:1000; font-size:16px; direction:ltr; text-align:center;">${fmt(i+1)}</td>
+        <td style="text-align:center;font-weight:1000">${fmt(i+1)}</td>
         <td style="font-weight:1000">${p.name}</td>
         <td style="direction:ltr; text-align:center;">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
         <td style="direction:ltr; text-align:center;">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
@@ -646,6 +700,264 @@ function buildCaptureHTML(){
   $('capture').innerHTML = html;
 }
 
+function toEnglishDigits(value){
+  return String(value ?? '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
+
+function setInvoiceCode(){
+  const input = $('invoiceCodeInput');
+  input.value = toEnglishDigits(invoiceCode || '');
+  $('codeModal').classList.add('show');
+  $('codeModal').setAttribute('aria-hidden','false');
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+
+function closeCodeModal(){
+  $('codeModal').classList.remove('show');
+  $('codeModal').setAttribute('aria-hidden','true');
+}
+
+function confirmInvoiceCode(){
+  const input = $('invoiceCodeInput');
+  const code = toEnglishDigits(input.value).replace(/\D/g,'');
+  if(code === ''){
+    invoiceCode = '';
+    localStorage.removeItem('foodCalcInvoiceCode');
+    updateInvoiceCodeButton();
+    closeCodeModal();
+    return;
+  }
+  if(!/^\d{3}$/.test(code)){
+    alert('کود باید دقیقاً سه رقم انگلیسی باشد؛ مثلاً 123.');
+    input.focus();
+    return;
+  }
+  invoiceCode = code;
+  localStorage.setItem('foodCalcInvoiceCode', invoiceCode);
+  updateInvoiceCodeButton();
+  closeCodeModal();
+}
+
+
+function updateInvoiceCodeButton(){
+  const btn=$('invoiceCodeBtn');
+  if(!btn) return;
+  btn.textContent=invoiceCode ? 'کود: '+invoiceCode : 'کود';
+  btn.classList.toggle('active', !!invoiceCode);
+}
+
+function getCurrentInvoiceData(){
+  return JSON.parse(JSON.stringify({
+    totalExpense: getTotalExpense(),
+    notes: $('notesInput').value,
+    code: invoiceCode || '',
+    persons: persons
+  }));
+}
+
+function getSavedInvoices(){
+  try { return JSON.parse(localStorage.getItem('foodCalcInvoices') || '[]'); }
+  catch(e){ return []; }
+}
+
+function getEnglishDateTime(date = new Date()){
+  const pad = n => String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}-${pad(date.getSeconds())}`;
+}
+
+function saveInvoiceRecord(){
+  if(!persons.length){ alert('ابتدا حداقل یک شخص به لیست اضافه کنید.'); return; }
+  const invoices = getSavedInvoices();
+  const now = new Date();
+  const solarNow = getSolarDateTime(now);
+  const record = {
+    id: 'inv_' + Date.now(),
+    title: 'فاکتور ' + (invoices.length + 1) + (invoiceCode ? ' - کود ' + invoiceCode : ''),
+    savedAt: getEnglishDateTime(now),
+    savedAtSolarDate: solarNow.date,
+    savedAtSolarTime: solarNow.time,
+    data: getCurrentInvoiceData()
+  };
+  invoices.unshift(record);
+  localStorage.setItem('foodCalcInvoices', JSON.stringify(invoices));
+  alert('فاکتور با موفقیت در مرورگر ثبت شد.');
+}
+
+function openInvoiceManager(){
+  renderInvoiceList();
+  $('invoiceManager').classList.add('show');
+  $('invoiceManager').setAttribute('aria-hidden','false');
+}
+
+function closeInvoiceManager(){
+  $('invoiceManager').classList.remove('show');
+  $('invoiceManager').setAttribute('aria-hidden','true');
+}
+
+function renderInvoiceList(){
+  const box = $('invoiceList');
+  const invoices = getSavedInvoices();
+  if(!invoices.length){
+    box.innerHTML = '<div class="empty">هنوز هیچ فاکتوری ثبت نشده است.</div>';
+    return;
+  }
+  box.innerHTML = invoices.map((inv, i) => {
+    const count = inv.data && Array.isArray(inv.data.persons) ? inv.data.persons.length : 0;
+    return `<div class="invoice-item">
+      <div class="invoice-item-title">${i+1}. ${escapeHtml(inv.title || 'فاکتور')}<div class="invoice-datetime">${recordDateTimeHtml(inv)}</div></div>
+      <div style="margin-bottom:8px;font-size:13px;color:#4b5563;">${count} نفر</div>
+      <div class="invoice-item-actions">
+        <button class="invoice-open" onclick="loadInvoiceRecord('${inv.id}')">باز کردن</button>
+        <button class="invoice-export" onclick="exportInvoiceFile('${inv.id}')">گرفتن کپی فایل</button>
+        <button class="invoice-delete" onclick="deleteInvoiceRecord('${inv.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(v){
+  return String(v == null ? '' : v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
+function findInvoice(id){ return getSavedInvoices().find(x => x.id === id); }
+
+function loadInvoiceData(data){
+  if(!data || !Array.isArray(data.persons)){ alert('فایل فاکتور معتبر نیست.'); return false; }
+  persons = JSON.parse(JSON.stringify(data.persons));
+  persons.forEach(p => {
+    if(p.months === undefined || p.totalDays === undefined){
+      const c = calculateMonthsAndDays(p.startDate[0],p.startDate[1],p.startDate[2],p.endDate[0],p.endDate[1],p.endDate[2]);
+      p.months=c.months; p.days=c.days; p.totalDays=c.totalDays;
+    }
+  });
+  localStorage.setItem('foodCalcExpense', String(parseMoney(data.totalExpense)));
+  invoiceCode = /^\d{3}$/.test(String(data.code || '')) ? String(data.code) : '';
+  localStorage.setItem('foodCalcInvoiceCode', invoiceCode);
+  updateInvoiceCodeButton();
+  $('notesInput').value = data.notes || '';
+  startDateObj=null; endDateObj=null; editIndex=-1;
+  $('personName').value=''; $('startDateText').textContent='انتخاب تاریخ'; $('endDateText').textContent='انتخاب تاریخ';
+  $('addPersonBtn').textContent='＋ افزودن شخص به لیست';
+  calculateCosts(); render(); saveData();
+  return true;
+}
+
+function loadInvoiceRecord(id){
+  const inv=findInvoice(id); if(!inv) return;
+  if(loadInvoiceData(inv.data)){ closeInvoiceManager(); alert('فاکتور باز شد و قابل ویرایش است.'); }
+}
+
+function copyInvoiceRecord(id){
+  const inv=findInvoice(id); if(!inv) return;
+  const invoices=getSavedInvoices();
+  const copy=JSON.parse(JSON.stringify(inv));
+  copy.id='inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  const copyDate = new Date();
+  const copySolar = getSolarDateTime(copyDate);
+  const copyCode = (copy.data && /^\d{3}$/.test(String(copy.data.code || ''))) ? String(copy.data.code) : '';
+  copy.title = copyCode ? `فاکتور (${copyCode})` : 'فاکتور';
+  copy.savedAt = getEnglishDateTime(copyDate);
+  copy.savedAtSolarDate = copySolar.date;
+  copy.savedAtSolarTime = copySolar.time;
+  invoices.unshift(copy);
+  localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
+  renderInvoiceList();
+}
+
+function photoInvoiceRecord(id){
+  const inv=findInvoice(id); if(!inv) return;
+  if(!loadInvoiceData(inv.data)) return;
+  closeInvoiceManager();
+  setTimeout(exportImage,100);
+}
+
+function deleteInvoiceRecord(id){
+  if(!confirm('این فاکتور ثبت‌شده حذف شود؟')) return;
+  const invoices=getSavedInvoices().filter(x=>x.id!==id);
+  localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
+  renderInvoiceList();
+}
+
+function toEnglishDigits(v){
+  return String(v ?? '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+}
+
+function getSolarDateTime(dateObj = new Date()){
+  const parts = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+  }).formatToParts(dateObj);
+  const get = type => parts.find(x => x.type === type)?.value || '';
+  const y = toEnglishDigits(get('year')).padStart(4,'0');
+  const m = toEnglishDigits(get('month')).padStart(2,'0');
+  const d = toEnglishDigits(get('day')).padStart(2,'0');
+  const h = toEnglishDigits(get('hour')).padStart(2,'0');
+  const min = toEnglishDigits(get('minute')).padStart(2,'0');
+  const sec = toEnglishDigits(get('second')).padStart(2,'0');
+  return { date:`${y}/${m}/${d}`, time:`${h}:${min}:${sec}` };
+}
+
+function getCopyFileDateTime(dateObj = new Date()){
+  const st = getSolarDateTime(dateObj);
+  // نام فایل: تاریخ شمسی در بخش اول و ساعت در قالب جداگانه و امن برای نام فایل
+  return `${st.date.replace(/\//g,'-')} [${st.time.replace(/:/g,'-')}]`;
+}
+
+function recordDateTimeHtml(inv){
+  if(inv.savedAtSolarDate || inv.savedAtSolarTime){
+    return `<span class="invoice-date">${escapeHtml(inv.savedAtSolarDate || '')}</span><span class="invoice-time">ساعت ${escapeHtml(inv.savedAtSolarTime || '')}</span>`;
+  }
+  return `<span class="invoice-date">${escapeHtml(inv.savedAt || '')}</span>`;
+}
+
+function exportInvoiceFile(id){
+  const inv=findInvoice(id); if(!inv) return;
+  const now = new Date();
+  const code = (inv.data && /^\d{3}$/.test(String(inv.data.code||''))) ? String(inv.data.code) : '';
+  const codePart = code ? ` (${code})` : '';
+  const dateTime = getCopyFileDateTime(now);
+  const fileName = `فاکتور${codePart}_${dateTime}.json`;
+  const exportRecord = JSON.parse(JSON.stringify(inv));
+  exportRecord.copiedAt = now.toISOString();
+  exportRecord.fileName = fileName;
+  const blob=new Blob([JSON.stringify(exportRecord,null,2)],{type:'application/json;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=fileName;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function importInvoiceFile(event){
+  const file=event.target.files && event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(){
+    try{
+      const obj=JSON.parse(reader.result);
+      const data=obj.data || obj;
+      if(!data || !Array.isArray(data.persons)) throw new Error('invalid');
+      const invoices=getSavedInvoices();
+      const importedCode = /^\d{3}$/.test(String(data.code || '')) ? String(data.code) : '';
+      const importNow = new Date();
+      const importSolar = getSolarDateTime(importNow);
+      const rec={
+        id:'inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+        title: importedCode ? `فاکتور (${importedCode})` : 'فاکتور واردشده',
+        savedAt:getEnglishDateTime(importNow),
+        savedAtSolarDate: importSolar.date,
+        savedAtSolarTime: importSolar.time,
+        data:data
+      };
+      invoices.unshift(rec);
+      localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
+      event.target.value='';
+      renderInvoiceList();
+      alert('کپی فاکتور با موفقیت وارد شد.');
+    }catch(e){ alert('فایل انتخاب‌شده فاکتور معتبر نیست.'); }
+  };
+  reader.readAsText(file);
+}
+
 function exportImage(){
   if(!persons.length){ alert('ابتدا حداقل یک شخص به لیست اضافه کنید.'); return; }
   buildCaptureHTML();
@@ -670,9 +982,14 @@ function exportImage(){
 }
 
 loadData();
+updateInvoiceCodeButton();
 $('expenseModalInput').addEventListener('input', function(){
   const raw = parseMoney(this.value);
   this.value = raw ? raw.toLocaleString('en-US') : '';
+});
+
+$('invoiceCodeInput').addEventListener('input', function(){
+  this.value = toEnglishDigits(this.value).replace(/\\D/g,'').slice(0,3);
 });
 </script>
 </body>
