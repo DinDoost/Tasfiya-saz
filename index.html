@@ -86,8 +86,8 @@ th:nth-child(1){background:var(--purple)}
 th:nth-child(2){background:var(--pink)}
 th:nth-child(3){background:var(--blue)}
 th:nth-child(4){background:var(--orange)}
-th:nth-child(5){background:#d63384} /* هدر ماه */
-th:nth-child(6){background:#198754}  /* هدر روز */
+th:nth-child(5){background:#d63384}
+th:nth-child(6){background:#198754}
 th:nth-child(7){background:#0b4fb7} 
 th:nth-child(8){background:#e22b25}
 td{background:#f8fbff}
@@ -96,7 +96,6 @@ tr:nth-child(even) td{background:#fff3fa}
 .num{font-weight:1000; font-size:15px; color:var(--purple); direction:ltr; text-align:center;}
 .money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:14px; color:#0b4fb7; text-align:center;}
 
-/* استایل دایره‌های بزرگتر با رنگ پر شده */
 .month-badge {
   display: inline-flex;
   align-items: center;
@@ -707,14 +706,12 @@ function toEnglishDigits(value){
 function setInvoiceCode(){
   const input = $('invoiceCodeInput');
   input.value = toEnglishDigits(invoiceCode || '');
-  $('codeModal').classList.add('show');
-  $('codeModal').setAttribute('aria-hidden','false');
+  $('codeModal').classList.add('show');$('codeModal').setAttribute('aria-hidden','false');
   setTimeout(() => { input.focus(); input.select(); }, 50);
 }
 
 function closeCodeModal(){
-  $('codeModal').classList.remove('show');
-  $('codeModal').setAttribute('aria-hidden','true');
+  $('codeModal').classList.remove('show');$('codeModal').setAttribute('aria-hidden','true');
 }
 
 function confirmInvoiceCode(){
@@ -737,7 +734,6 @@ function confirmInvoiceCode(){
   updateInvoiceCodeButton();
   closeCodeModal();
 }
-
 
 function updateInvoiceCodeButton(){
   const btn=$('invoiceCodeBtn');
@@ -772,7 +768,7 @@ function saveInvoiceRecord(){
   const solarNow = getSolarDateTime(now);
   const record = {
     id: 'inv_' + Date.now(),
-    title: 'فاکتور ' + (invoices.length + 1) + (invoiceCode ? ' - کود ' + invoiceCode : ''),
+    title: 'حساب گر' + (invoiceCode ? ' ' + invoiceCode : ''),
     savedAt: getEnglishDateTime(now),
     savedAtSolarDate: solarNow.date,
     savedAtSolarTime: solarNow.time,
@@ -785,13 +781,11 @@ function saveInvoiceRecord(){
 
 function openInvoiceManager(){
   renderInvoiceList();
-  $('invoiceManager').classList.add('show');
-  $('invoiceManager').setAttribute('aria-hidden','false');
+  $('invoiceManager').classList.add('show');$('invoiceManager').setAttribute('aria-hidden','false');
 }
 
 function closeInvoiceManager(){
-  $('invoiceManager').classList.remove('show');
-  $('invoiceManager').setAttribute('aria-hidden','true');
+  $('invoiceManager').classList.remove('show');$('invoiceManager').setAttribute('aria-hidden','true');
 }
 
 function renderInvoiceList(){
@@ -804,7 +798,7 @@ function renderInvoiceList(){
   box.innerHTML = invoices.map((inv, i) => {
     const count = inv.data && Array.isArray(inv.data.persons) ? inv.data.persons.length : 0;
     return `<div class="invoice-item">
-      <div class="invoice-item-title">${i+1}. ${escapeHtml(inv.title || 'فاکتور')}<div class="invoice-datetime">${recordDateTimeHtml(inv)}</div></div>
+      <div class="invoice-item-title">${i+1}. ${escapeHtml(inv.title || 'حساب گر')}<div class="invoice-datetime">${recordDateTimeHtml(inv)}</div></div>
       <div style="margin-bottom:8px;font-size:13px;color:#4b5563;">${count} نفر</div>
       <div class="invoice-item-actions">
         <button class="invoice-open" onclick="loadInvoiceRecord('${inv.id}')">باز کردن</button>
@@ -855,7 +849,7 @@ function copyInvoiceRecord(id){
   const copyDate = new Date();
   const copySolar = getSolarDateTime(copyDate);
   const copyCode = (copy.data && /^\d{3}$/.test(String(copy.data.code || ''))) ? String(copy.data.code) : '';
-  copy.title = copyCode ? `فاکتور (${copyCode})` : 'فاکتور';
+  copy.title = 'حساب گر' + (copyCode ? ' ' + copyCode : '');
   copy.savedAt = getEnglishDateTime(copyDate);
   copy.savedAtSolarDate = copySolar.date;
   copy.savedAtSolarTime = copySolar.time;
@@ -878,10 +872,6 @@ function deleteInvoiceRecord(id){
   renderInvoiceList();
 }
 
-function toEnglishDigits(v){
-  return String(v ?? '').replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-}
-
 function getSolarDateTime(dateObj = new Date()){
   const parts = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
     year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
@@ -896,12 +886,6 @@ function getSolarDateTime(dateObj = new Date()){
   return { date:`${y}/${m}/${d}`, time:`${h}:${min}:${sec}` };
 }
 
-function getCopyFileDateTime(dateObj = new Date()){
-  const st = getSolarDateTime(dateObj);
-  // نام فایل: تاریخ شمسی در بخش اول و ساعت در قالب جداگانه و امن برای نام فایل
-  return `${st.date.replace(/\//g,'-')} [${st.time.replace(/:/g,'-')}]`;
-}
-
 function recordDateTimeHtml(inv){
   if(inv.savedAtSolarDate || inv.savedAtSolarTime){
     return `<span class="invoice-date">${escapeHtml(inv.savedAtSolarDate || '')}</span><span class="invoice-time">ساعت ${escapeHtml(inv.savedAtSolarTime || '')}</span>`;
@@ -911,13 +895,11 @@ function recordDateTimeHtml(inv){
 
 function exportInvoiceFile(id){
   const inv=findInvoice(id); if(!inv) return;
-  const now = new Date();
   const code = (inv.data && /^\d{3}$/.test(String(inv.data.code||''))) ? String(inv.data.code) : '';
-  const codePart = code ? ` (${code})` : '';
-  const dateTime = getCopyFileDateTime(now);
-  const fileName = `فاکتور${codePart}_${dateTime}.json`;
+  const codePart = code ? ` ${code}` : '';
+  const fileName = `حساب گر${codePart}.json`;
   const exportRecord = JSON.parse(JSON.stringify(inv));
-  exportRecord.copiedAt = now.toISOString();
+  exportRecord.copiedAt = new Date().toISOString();
   exportRecord.fileName = fileName;
   const blob=new Blob([JSON.stringify(exportRecord,null,2)],{type:'application/json;charset=utf-8'});
   const a=document.createElement('a');
@@ -942,7 +924,7 @@ function importInvoiceFile(event){
       const importSolar = getSolarDateTime(importNow);
       const rec={
         id:'inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-        title: importedCode ? `فاکتور (${importedCode})` : 'فاکتور واردشده',
+        title: 'حساب گر' + (importedCode ? ' ' + importedCode : ''),
         savedAt:getEnglishDateTime(importNow),
         savedAtSolarDate: importSolar.date,
         savedAtSolarTime: importSolar.time,
@@ -989,7 +971,7 @@ $('expenseModalInput').addEventListener('input', function(){
 });
 
 $('invoiceCodeInput').addEventListener('input', function(){
-  this.value = toEnglishDigits(this.value).replace(/\\D/g,'').slice(0,3);
+  this.value = toEnglishDigits(this.value).replace(/\D/g,'').slice(0,3);
 });
 </script>
 </body>
