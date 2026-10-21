@@ -2,977 +2,403 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>محاسبه اشتراک مصارف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-*{box-sizing:border-box}
-:root{
-  --blue:#1769e0; --pink:#ed1670; --green:#20a94b; --orange:#ff8a00;
-  --purple:#7040c7; --red:#e22b25; --ink:#111827; --cream:#fffdf6;
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--blue:#1769e0;--pink:#d63384;--green:#16885b;--orange:#f08000;--purple:#6d3fc4;--red:#d92323;--ink:#111827;--mute:#5b6577;--line:#dbe5f4}
+body{margin:0;font-family:"Vazirmatn",Tahoma,sans-serif;font-size:18px;font-weight:700;line-height:1.7;color:var(--ink);
+background:linear-gradient(135deg,#eaf3ff,#fff3fa 50%,#effcf1);min-height:100vh;padding:14px}
+button,input,select,textarea{font:inherit}
+.app{max-width:1000px;margin:auto}
+.hero{background:linear-gradient(135deg,#16885b,#1769e0);color:#fff;border-radius:28px;padding:62px 16px 22px;text-align:center;
+box-shadow:0 10px 30px #1769e033;margin-bottom:14px;position:relative}
+.hero h1{margin:0;font-size:34px;font-weight:900}
+.hero p{margin:4px 0 0;font-size:17px;opacity:.92}
+.code-btn{position:absolute;top:12px;left:50%;transform:translateX(-50%);border:0;border-radius:14px;background:#ffffff38;color:#fff;padding:6px 22px;font-weight:900;font-size:18px;cursor:pointer;white-space:nowrap}
+.code-btn.active{background:#fff;color:var(--purple)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:20px;padding:12px 8px;text-align:center;box-shadow:0 4px 14px #0001;border-bottom:5px solid var(--c)}
+.stat small{display:block;color:var(--mute);font-size:15px}
+.stat b{font-size:24px;font-weight:900;color:var(--c);direction:ltr;unicode-bidi:plaintext;display:block}
+.panel{background:#fff;border-radius:24px;padding:18px;box-shadow:0 6px 22px #0000000f;margin-bottom:14px}
+.panel h2{margin:0 0 12px;font-size:22px;font-weight:900;color:var(--blue)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wide{grid-column:1/-1}
+label{display:block;font-size:17px;font-weight:900;margin-bottom:6px}
+input,select,textarea{width:100%;border:2px solid var(--line);border-radius:14px;padding:13px 12px;font-size:20px;font-weight:700;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 4px #4d8df720}
+.datebtn{width:100%;border:2px solid var(--line);border-radius:14px;padding:13px 12px;background:#fff;font-size:20px;font-weight:700;display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:var(--ink)}
+.datebtn.set{border-color:var(--green);background:#f0fbf5}
+.btn{border:0;border-radius:16px;padding:14px 16px;font-size:19px;font-weight:900;cursor:pointer;color:#fff;box-shadow:0 4px 12px #0002;transition:transform .1s}
+.btn:active{transform:scale(.96)}
+.b-add{background:linear-gradient(135deg,#1fb455,#0a8a3d);width:100%;margin-top:14px;font-size:21px}
+.b-cancel{background:#eef2f8;color:var(--ink);box-shadow:none;border:2px solid var(--line)}
+.b-img{background:linear-gradient(135deg,#1769e0,#0b4fb7)}.b-save{background:linear-gradient(135deg,#7a4be0,#5a2fb0)}
+.b-load{background:linear-gradient(135deg,#ed1670,#c40d58)}.b-clear{background:#eef2f8;color:var(--red);box-shadow:none;border:2px solid var(--line)}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.tablewrap{border-radius:18px;overflow:hidden;border:2px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:#fff}
+th{color:#fff;font-size:16px;font-weight:900;padding:12px 6px;background:var(--purple)}
+th:nth-child(2){background:var(--pink)}th:nth-child(3){background:var(--blue)}th:nth-child(4){background:var(--orange)}
+th:nth-child(5){background:var(--pink)}th:nth-child(6){background:var(--green)}th:nth-child(7){background:#0b4fb7}th:nth-child(8){background:var(--red)}
+td{padding:12px 6px;text-align:center;font-size:18px;border-bottom:1px solid #edf1f8}
+tr:nth-child(even) td{background:#fbf6ff}
+.ltr{direction:ltr;unicode-bidi:plaintext}
+.badge{display:inline-block;min-width:70px;padding:4px 12px;border-radius:20px;border:2px solid;font-weight:900;font-size:16px}
+.bm{background:#fce8f3;border-color:var(--pink);color:#a8266b}.bd{background:#e8f8f0;border-color:var(--green);color:#136b45}
+.mini{border:0;border-radius:10px;padding:7px 12px;color:#fff;font-weight:900;font-size:15px;cursor:pointer;margin:2px}
+.empty{text-align:center;padding:30px 10px;color:var(--mute);font-size:19px}
+.total{margin-top:16px;border:4px solid #e52c20;border-radius:22px;background:linear-gradient(135deg,#fff36b,#ffc928);padding:16px;text-align:center;cursor:pointer;box-shadow:0 6px 20px #0002}
+.total small{display:block;color:#8e1710;font-size:17px;font-weight:900}
+.total strong{display:block;color:#a40000;font-size:34px;font-weight:900;direction:ltr;unicode-bidi:plaintext}
+textarea{resize:vertical;min-height:90px}
+.modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:#0007;backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:.2s;padding:12px}
+.modal.show{opacity:1;visibility:visible}
+.dialog{width:min(94vw,440px);max-height:90vh;overflow:auto;background:#fff;border-radius:26px;padding:20px;box-shadow:0 14px 40px #0005}
+.dialog h3{margin:0 0 14px;text-align:center;font-size:24px;font-weight:900;color:var(--blue)}
+.dialog input.big{text-align:center;direction:ltr;font-size:26px;font-weight:900}
+.row{display:flex;gap:10px;margin-top:14px}.row .btn{flex:1}
+.b-ok{background:linear-gradient(135deg,#1fb455,#0a8a3d)}
+.inv{border:2px solid var(--line);border-radius:18px;padding:12px;background:#f8fbff;margin-bottom:10px}
+.inv b{color:var(--blue);font-size:20px}.inv small{display:block;color:var(--mute);font-size:15px;direction:ltr;text-align:right}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,30px);background:#111827;color:#fff;padding:14px 24px;border-radius:18px;font-size:18px;font-weight:900;z-index:2000;opacity:0;pointer-events:none;transition:.25s;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}.toast.err{background:#c62020}.toast.ok{background:#128a4b}
+.cap{position:fixed;left:-10000px;top:0}
+#capture{width:800px;padding:28px;background:linear-gradient(135deg,#fffdf6,#f4f9ff);border:7px solid #16885b;border-radius:34px;font-family:"Vazirmatn",Tahoma,sans-serif}
+@media(max-width:760px){
+ body{padding:10px}.hero h1{font-size:27px}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}
+ .actions{grid-template-columns:1fr 1fr}.total strong{font-size:30px}
+ table,tbody,tr,td{display:block;width:100%}thead{display:none}
+ .tablewrap{border:0;border-radius:0}
+ tr{background:#fff;border:2px solid var(--line);border-radius:20px;margin-bottom:12px;overflow:hidden;box-shadow:0 3px 10px #0001}
+ td,tr:nth-child(even) td{display:flex;justify-content:space-between;align-items:center;text-align:right;padding:10px 14px;background:#fff}
+ td::before{content:attr(data-l);color:var(--mute);font-size:16px;font-weight:700}
+ td.nm{background:linear-gradient(135deg,#f3ebff,#ffeaf5);font-size:22px;font-weight:900}td.nm::before{content:none}
+ td.act{justify-content:center;gap:8px}td.act::before{content:none}.mini{padding:10px 22px;font-size:17px}
 }
-body{
-  margin:0; font-family:Tahoma,"Vazirmatn","Noto Naskh Arabic",sans-serif;
-  background:linear-gradient(135deg,#eef6ff,#fff4fb 45%,#f4fff4);
-  color:var(--ink); padding:12px; font-weight:800;
-  overscroll-behavior-y: contain;
-}
-button,input,select{font:inherit; font-weight:900;}
-
-.app{max-width:940px;margin:auto}
-.top{position:relative;
-  background:linear-gradient(135deg,#fff,#fff9ef);
-  border:3px solid #1c9b66;border-radius:26px;padding:48px 14px 14px;
-  box-shadow:0 8px 28px #00000018; margin-bottom:12px; position:relative; overflow:hidden;
-}
-.top:before,.top:after{content:"📊";position:absolute;font-size:45px;opacity:.75;top:8px}
-.top:before{left:10px}.top:after{right:10px}
-
-h1{text-align:center;color:#d92323;font-size:34px;margin:5px 0 5px;text-shadow:2px 2px #ffd8d8;font-weight:1000; position:relative; z-index:5;}
-
-.expense-modal{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;background:#00000066;backdrop-filter:blur(4px);opacity:0;visibility:hidden;pointer-events:none;transition:.2s;}
-.expense-modal.show{opacity:1;visibility:visible;pointer-events:auto;}
-.expense-dialog{width:min(92vw,420px);background:#fff;border:3px solid #1c9b66;border-radius:22px;padding:18px;box-shadow:0 12px 35px #0004;}
-.expense-dialog h3{margin:0 0 12px;text-align:center;color:#1769e0;font-size:22px;}
-.expense-dialog input{font-size:22px;text-align:center;direction:ltr;}
-.expense-modal-actions{display:flex;gap:10px;margin-top:12px;}
-.expense-modal-actions button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:1000;font-size:16px;cursor:pointer;}
-.expense-confirm{background:#20a94b;color:#fff;}
-.expense-cancel{background:#f2f5fa;color:#111827;}
-
-.panel{ background:#ffffffec;border:2px solid #d8e5ff;border-radius:20px; padding:16px;box-shadow:0 6px 20px #00000012;margin-bottom:12px }
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-grid .wide{grid-column:1/-1}
-label{font-size:14px;font-weight:1000;color:#1f2937;margin:0 0 6px;display:block}
-input,select{ width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:12px 10px; background:#fff;outline:none;color:#111827; font-size:16px; font-weight:900; }
-input:focus,select:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
-
-.date-input-group { position: relative; }
-.date-display-btn {
-  width: 100%; background: #fff; border: 2px solid #dbe5f4; border-radius: 12px;
-  padding: 12px 10px; font-size: 16px; font-weight: 900; color: #111827; text-align: right;
-  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-}
-.date-display-btn:active { background: #f0f4ff; }
-
-.btn{ border:0;border-radius:13px;padding:12px 14px;font-weight:1000;font-size:16px;cursor:pointer; box-shadow:0 4px 10px #00000018; transition:.12s transform,.12s filter }
-.btn:active{transform:scale(.95)}
-.add{background:linear-gradient(135deg,#18a34a,#07883b);color:white;width:100%;margin-top:12px; font-size:18px;}
-.image{background:linear-gradient(135deg,#1769e0,#0b4fb7);color:white;flex:1; font-size:18px;}
-.clear{background:#f2f5fa;color:#111827; border:2px solid #dbe5f4;}
-.save-invoice{background:#7040c7;color:#fff;flex:1;font-size:18px;}
-.retrieve-invoice{background:#ed1670;color:#fff;flex:1;font-size:18px;}
-.invoice-manager-dialog{width:min(94vw,560px);max-height:86vh;overflow:auto;}
-.invoice-list{display:flex;flex-direction:column;gap:9px;max-height:52vh;overflow:auto;}
-.invoice-item{border:2px solid #dbe5f4;border-radius:14px;padding:10px;background:#f8fbff;}
-.invoice-item-title{font-weight:1000;color:#1769e0;margin-bottom:7px;}
-.invoice-datetime{display:flex;flex-direction:column;gap:2px;margin-top:4px;line-height:1.45;direction:ltr;text-align:right;font-weight:900;}
-.invoice-date{display:block;}
-.invoice-time{display:block;font-size:12px;color:#667085;}
-
-.invoice-item-actions{display:flex;gap:6px;flex-wrap:wrap;}
-.invoice-item-actions button{border:0;border-radius:9px;padding:7px 9px;font-weight:1000;cursor:pointer;color:#fff;}
-.invoice-open{background:#1769e0}.invoice-copy{background:#7040c7}.invoice-photo{background:#198754}.invoice-export{background:#ff8a00}.invoice-delete{background:#e22b25}
-.invoice-import{margin-top:12px;padding-top:12px;border-top:2px dashed #dbe5f4;}
-.import-btn{width:100%;background:#20a94b;color:#fff;}
-.actions{display:flex;gap:10px;margin-top:14px;position:relative;z-index:10;}
-.count{font-weight:1000;color:#1a5dc6;font-size:16px; margin-bottom:10px;}
-
-.table-wrap{overflow-x:auto;border-radius:15px;border:1px solid #d8e1ee}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:780px;background:white}
-th,td{padding:12px 6px;text-align:center;border-left:1px solid #fff;border-bottom:1px solid #fff;font-weight:900; font-size:13px; color:#111827;}
-th{color:#fff; font-size:13px; font-weight:1000;}
-th:nth-child(1){background:var(--purple)} 
-th:nth-child(2){background:var(--pink)}
-th:nth-child(3){background:var(--blue)}
-th:nth-child(4){background:var(--orange)}
-th:nth-child(5){background:#d63384}
-th:nth-child(6){background:#198754}
-th:nth-child(7){background:#0b4fb7} 
-th:nth-child(8){background:#e22b25}
-td{background:#f8fbff}
-tr:nth-child(even) td{background:#fff3fa}
-
-.num{font-weight:1000; font-size:15px; color:var(--purple); direction:ltr; text-align:center;}
-.money{direction:ltr;unicode-bidi:plaintext; font-weight:1000; font-size:14px; color:#0b4fb7; text-align:center;}
-
-.month-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 65px;
-  height: 42px;
-  padding: 0 10px;
-  background: #fce8f3;
-  border: 2px solid #d63384;
-  border-radius: 21px;
-  color: #b02a6b;
-  font-weight: 1000;
-  font-size: 14px;
-}
-
-.day-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 65px;
-  height: 42px;
-  padding: 0 10px;
-  background: #e8f8f0;
-  border: 2px solid #198754;
-  border-radius: 21px;
-  color: #146c43;
-  font-weight: 1000;
-  font-size: 14px;
-}
-
-.edit{background:#1769e0;color:white;padding:6px 8px;border-radius:8px;border:0; cursor:pointer; font-weight:1000; font-size:12px;}
-.del{background:#ef3340;color:white;padding:6px 8px;border-radius:8px;border:0;margin-right:2px; cursor:pointer; font-weight:1000; font-size:12px;}
-
-.total-sum-box{
-  margin-top:16px;border:4px solid #e52c20;border-radius:20px;
-  background:linear-gradient(135deg,#fff36b,#ffc928);
-  padding:16px;text-align:center;box-shadow:0 6px 20px #0002; cursor:pointer;
-}
-.total-sum-box small{display:block;color:#8e1710;font-weight:1000;font-size:16px}
-.total-sum-box strong{display:block;color:#a40000;font-size:26px; font-weight:1000; margin-top:4px; direction:ltr; unicode-bidi:plaintext;}
-.empty{text-align:center;padding:25px;color:#4b5563;font-weight:900; font-size:16px;}
-
-.notes-box{margin-top:12px}
-textarea{width:100%;border:2px solid #dbe5f4;border-radius:12px;padding:10px;background:#fff;outline:none;color:#111827;resize:vertical;font-family:inherit;font-size:16px; font-weight:900;}
-textarea:focus{border-color:#4d8df7;box-shadow:0 0 0 3px #4d8df71b}
-
-.invoice-card{ position:fixed;left:-10000px;top:0;width:1050px;background:#fff; }
-#capture{ width:1050px;padding:26px;background:linear-gradient(135deg,#fffdf6,#f7fbff); border:6px solid #16885b;border-radius:30px;overflow:hidden; }
-.capture-title{font-size:42px;text-align:center;color:#d92323;font-weight:1000;margin:3px 0 15px}
-.capture-table{width:100%;margin:0 auto;border-collapse:separate;border-spacing:4px;table-layout:fixed}
-.capture-table th{font-size:16px;padding:10px 4px;font-weight:1000}
-.capture-table td{font-size:18px;padding:10px 4px;font-weight:1000; color:#111827;}
-.capture-total{margin-top:20px;border:5px solid #e32b22;border-radius:22px;background:#ffd12b;text-align:center;padding:16px;font-size:28px;font-weight:1000;color:#9d0808;direction:ltr;unicode-bidi:plaintext;}
-.capture-footer{margin-top:18px;border:4px solid #16885b;border-radius:20px;overflow:hidden;background:#fff;direction:rtl; padding:16px; font-size:20px; line-height:1.6; font-weight:1000;}
-
-.persian-calendar{position:fixed;z-index:100000;display:none;top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,340px);background:#fff;border:3px solid #1c9b66;border-radius:22px;padding:18px;box-shadow:0 12px 35px #0004;direction:rtl}
-.persian-calendar.show{display:block}
-.pc-title{font-size:20px;font-weight:1000;color:#1769e0;text-align:center;margin-bottom:14px}
-.pc-form-group{margin-bottom:10px}
-.pc-form-group label{font-size:13px;color:#374151;margin-bottom:4px}
-.pc-form-group input{text-align:center;direction:ltr;font-size:18px;font-weight:1000;}
-.pc-actions{display:flex;gap:8px;margin-top:14px}
-.pc-actions button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:1000;font-size:16px;cursor:pointer}
-.pc-confirm{background:#20a94b;color:#fff;}
-.pc-cancel{background:#f2f5fa;color:#111827;}
-
-.save-success{
-  position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;background:#00000066; backdrop-filter:blur(4px);
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease;
-}
-.save-success.show{opacity:1;visibility:visible;pointer-events:auto;}
-.save-success-check{
-  width:110px;height:110px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;background:#20a94b;color:#fff;border:6px solid #fff;
-  box-shadow:0 10px 30px #0006;font-size:75px;font-weight:1000;line-height:1;
-}
-.save-success-text{
-  margin-top:18px;padding:10px 20px;border-radius:14px;background:#fff;color:#16885b;
-  font-size:20px;font-weight:1000;box-shadow:0 6px 20px #0004;
-}
-
-@media(max-width:620px){
-  body{padding:8px} h1{font-size:26px}
-  .form-grid{grid-template-columns:1fr}
-}
-
-.code-btn{position:absolute;left:50%;transform:translateX(-50%);top:10px;border:0;border-radius:9px;background:#1769e0;color:#fff;padding:6px 12px;font-size:13px;font-weight:1000;cursor:pointer;}
-.code-btn.active{background:#7040c7;}
-@media(max-width:620px){.code-btn{left:50%;transform:translateX(-50%);top:8px;padding:5px 9px;font-size:12px;}}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <div class="top">
-    <button type="button" class="code-btn" id="invoiceCodeBtn" onclick="setInvoiceCode()">کود</button>
-    <h1>محاسبه اشتراک مصارف</h1>
+ <div class="hero">
+  <button type="button" class="code-btn" id="codeBtn" onclick="openCode()">کود</button>
+  <h1>🧮 محاسبه اشتراک مصارف</h1>
+  <p>سهم هر شخص را بر اساس روزهای حضور، دقیق و ساده حساب کنید</p>
+ </div>
+
+ <div class="stats">
+  <div class="stat" style="--c:#6d3fc4"><small>تعداد افراد</small><b id="sCount">0</b></div>
+  <div class="stat" style="--c:#16885b"><small>مجموع روزها</small><b id="sDays">0</b></div>
+  <div class="stat" style="--c:#f08000"><small>سهم هر روز</small><b id="sRate">0</b></div>
+  <div class="stat" style="--c:#d92323"><small>مجموع مصارف</small><b id="sTotal">0</b></div>
+ </div>
+
+ <div class="panel">
+  <h2 id="formTitle">➕ افزودن شخص</h2>
+  <div class="grid">
+   <div class="wide"><label for="personName">نام شخص</label><input id="personName" placeholder="مثلاً احمد جان" autocomplete="off"></div>
+   <div><label>تاریخ شروع حضور</label><button type="button" class="datebtn" id="startBtn" onclick="openCal('start')"><span id="startTxt">انتخاب تاریخ</span><span>📅</span></button></div>
+   <div><label>تاریخ ختم حضور</label><button type="button" class="datebtn" id="endBtn" onclick="openCal('end')"><span id="endTxt">انتخاب تاریخ</span><span>📅</span></button></div>
   </div>
+  <button class="btn b-add" id="addBtn" type="button" onclick="savePerson()">＋ افزودن شخص به لیست</button>
+  <button class="btn b-cancel" id="cancelEdit" type="button" onclick="resetForm()" style="display:none;width:100%;margin-top:10px">انصراف از ویرایش</button>
+ </div>
 
-  <div class="panel">
-    <div class="form-grid">
-      <div class="wide">
-        <label>نام شخص</label>
-        <input id="personName" placeholder="مثلاً احمد جان">
-      </div>
-      <div>
-        <label>تاریخ شروع حضور</label>
-        <div class="date-input-group">
-          <button type="button" class="date-display-btn" id="startDateBtn" onclick="openCalendar('start')">
-            <span id="startDateText">انتخاب تاریخ</span> 📅
-          </button>
-        </div>
-      </div>
-      <div>
-        <label>تاریخ ختم حضور</label>
-        <div class="date-input-group">
-          <button type="button" class="date-display-btn" id="endDateBtn" onclick="openCalendar('end')">
-            <span id="endDateText">انتخاب تاریخ</span> 📅
-          </button>
-        </div>
-      </div>
-    </div>
-    <button class="btn add" id="addPersonBtn" type="button" onclick="addOrUpdatePerson()">＋ افزودن شخص به لیست</button>
+ <div class="panel">
+  <h2>📋 لیست افراد</h2>
+  <div class="tablewrap">
+   <table>
+    <thead><tr><th>شماره</th><th>نام شخص</th><th>تاریخ شروع</th><th>تاریخ ختم</th><th>ماه</th><th>روز</th><th>سهم هر روز (تومان)</th><th>مصرف کامل (تومان)</th><th>عملیات</th></tr></thead>
+    <tbody id="rows"></tbody>
+   </table>
+   <div class="empty" id="empty">هنوز شخصی اضافه نشده است.</div>
   </div>
-
-  <div class="panel">
-    <div class="count" id="personCount">0 نفر در لیست</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>شماره</th>
-            <th>نام شخص</th>
-            <th>تاریخ شروع</th>
-            <th>تاریخ ختم</th>
-            <th>تعداد ماه</th>
-            <th>تعداد روز</th>
-            <th>سهم هر روز (تومان)</th>
-            <th>جمع سهم شخص (تومان)</th>
-            <th>عملیات</th>
-          </tr>
-        </thead>
-        <tbody id="personsRows"></tbody>
-      </table>
-      <div class="empty" id="emptyMsg">هنوز شخصی اضافه نشده است.</div>
-    </div>
-
-    <div class="total-sum-box" role="button" tabindex="0" onclick="openExpenseModal()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openExpenseModal();}">
-      <small>مجموع کل مصارف (برای تغییر مبلغ کل اینجا کلیک کنید)</small>
-      <strong id="totalSummaryText">0 تومان</strong>
-    </div>
-
-    <div class="notes-box">
-      <label for="notesInput">توضیحات فاکتور</label>
-      <textarea id="notesInput" rows="3" placeholder="مثلاً: هزینه مصارف مشترک اتاق..." oninput="handleNotesInput()"></textarea>
-    </div>
-
-    <div class="actions">
-      <button class="btn image" type="button" onclick="exportImage()">▣ ذخیره عکس فاکتور</button>
-      <button class="btn save-invoice" type="button" onclick="saveInvoiceRecord()">💾 ثبت</button>
-      <button class="btn retrieve-invoice" type="button" onclick="openInvoiceManager()">↻ بازیابی</button>
-      <button class="btn clear" type="button" onclick="clearAllData()">پاک‌کردن همه</button>
-    </div>
+  <div class="total" role="button" tabindex="0" onclick="openExpense()" onkeydown="if(event.key==='Enter')openExpense()">
+   <small>مجموع کل مصارف · برای تغییر مبلغ لمس کنید ✏️</small>
+   <strong id="totalTxt">0 تومان</strong>
   </div>
+  <div style="margin-top:14px"><label for="notes">📝 توضیحات فاکتور</label>
+   <textarea id="notes" placeholder="مثلاً: هزینه مصارف مشترک اتاق..." oninput="persist()"></textarea></div>
+  <div class="actions">
+   <button class="btn b-img" type="button" onclick="exportImage()">🖼 عکس فاکتور</button>
+   <button class="btn b-save" type="button" onclick="saveInvoice()">💾 ثبت</button>
+   <button class="btn b-load" type="button" onclick="openInvoices()">↻ بازیابی</button>
+   <button class="btn b-clear" type="button" onclick="clearAll()">🗑 پاک‌کردن</button>
+  </div>
+ </div>
 </div>
 
-<div class="invoice-card"><div id="capture"></div></div>
+<div class="cap"><div id="capture"></div></div>
 
-<div id="persianCalendar" class="persian-calendar" aria-hidden="true">
-  <div class="pc-title" id="pcTitleModal">انتخاب تاریخ</div>
-  <div class="pc-form-group">
-    <label>سال (مثلاً 1405)</label>
-    <input id="pcYearInput" type="text" inputmode="numeric" placeholder="1405">
-  </div>
-  <div class="pc-form-group">
-    <label>ماه (عدد 1 تا 12)</label>
-    <input id="pcMonthInput" type="text" inputmode="numeric" placeholder="1">
-  </div>
-  <div class="pc-form-group">
-    <label>روز (عدد 1 تا 31)</label>
-    <input id="pcDayInput" type="text" inputmode="numeric" placeholder="1">
-  </div>
-  <div class="pc-actions">
-    <button type="button" class="pc-confirm" onclick="confirmCalendarDate()">تأیید تاریخ</button>
-    <button type="button" class="pc-cancel" onclick="closeCalendar()">انصراف</button>
-  </div>
+<div class="modal" id="calModal" onclick="if(event.target===this)closeM('calModal')">
+ <div class="dialog">
+  <h3 id="calTitle">انتخاب تاریخ</h3>
+  <label for="cy">سال</label><input id="cy" class="big" inputmode="numeric" maxlength="4">
+  <label for="cm" style="margin-top:10px">ماه</label><select id="cm"></select>
+  <label for="cd" style="margin-top:10px">روز</label><select id="cd"></select>
+  <div class="row"><button class="btn b-ok" type="button" onclick="confirmCal()">تأیید تاریخ</button><button class="btn b-cancel" type="button" onclick="closeM('calModal')">انصراف</button></div>
+ </div>
 </div>
 
-<div id="codeModal" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeCodeModal()">
-  <div class="expense-dialog" role="dialog" aria-modal="true" aria-labelledby="codeModalTitle">
-    <h3 id="codeModalTitle">ثبت کود فاکتور</h3>
-    <input id="invoiceCodeInput" type="text" inputmode="numeric" maxlength="3"
-           placeholder="123" autocomplete="off" dir="ltr"
-           style="font-family:Arial,sans-serif;letter-spacing:3px;">
-    <div class="expense-modal-actions">
-      <button type="button" class="expense-confirm" onclick="confirmInvoiceCode()">تأیید</button>
-      <button type="button" class="expense-cancel" onclick="closeCodeModal()">انصراف</button>
-    </div>
-  </div>
+<div class="modal" id="expModal" onclick="if(event.target===this)closeM('expModal')">
+ <div class="dialog">
+  <h3>مبلغ کل مصارف (تومان)</h3>
+  <input id="expInput" class="big" inputmode="numeric" placeholder="مثلاً 120,000,000" autocomplete="off">
+  <div class="row"><button class="btn b-ok" type="button" onclick="confirmExpense()">تأیید</button><button class="btn b-cancel" type="button" onclick="closeM('expModal')">انصراف</button></div>
+ </div>
 </div>
 
-<div id="expenseModal" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeExpenseModal()">
-  <div class="expense-dialog" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
-    <h3 id="expenseModalTitle">ثبت مبلغ کل مصارف</h3>
-    <input id="expenseModalInput" type="text" inputmode="numeric" placeholder="مثلاً 120000000">
-    <div class="expense-modal-actions">
-      <button type="button" class="expense-confirm" onclick="confirmExpense()">تأیید</button>
-      <button type="button" class="expense-cancel" onclick="closeExpenseModal()">انصراف</button>
-    </div>
-  </div>
+<div class="modal" id="codeModal" onclick="if(event.target===this)closeM('codeModal')">
+ <div class="dialog">
+  <h3>کود فاکتور</h3>
+  <input id="codeInput" class="big" inputmode="numeric" maxlength="3" placeholder="123" autocomplete="off" style="letter-spacing:6px">
+  <p style="text-align:center;color:var(--mute);font-size:16px;margin:8px 0 0">سه رقم · برای حذف کود، خالی بگذارید</p>
+  <div class="row"><button class="btn b-ok" type="button" onclick="confirmCode()">تأیید</button><button class="btn b-cancel" type="button" onclick="closeM('codeModal')">انصراف</button></div>
+ </div>
 </div>
 
-<div id="invoiceManager" class="expense-modal" aria-hidden="true" onclick="if(event.target===this)closeInvoiceManager()">
-  <div class="expense-dialog invoice-manager-dialog" role="dialog" aria-modal="true">
-    <h3>بازیابی فاکتورها</h3>
-    <div id="invoiceList" class="invoice-list"></div>
-    <div class="invoice-import">
-      <button type="button" class="btn import-btn" onclick="document.getElementById('invoiceFileInput').click()">＋ آوردن کپی از جای دیگر</button>
-      <input id="invoiceFileInput" type="file" accept=".json,application/json" style="display:none" onchange="importInvoiceFile(event)">
-    </div>
-    <div class="expense-modal-actions">
-      <button type="button" class="expense-cancel" onclick="closeInvoiceManager()">بستن</button>
-    </div>
-  </div>
+<div class="modal" id="invModal" onclick="if(event.target===this)closeM('invModal')">
+ <div class="dialog" style="width:min(94vw,560px)">
+  <h3>فاکتورهای ثبت‌شده</h3>
+  <div id="invList"></div>
+  <button class="btn b-ok" type="button" style="width:100%" onclick="$('invFile').click()">＋ آوردن کپی از فایل</button>
+  <input id="invFile" type="file" accept=".json,application/json" style="display:none" onchange="importInvoice(event)">
+  <div class="row"><button class="btn b-cancel" type="button" onclick="closeM('invModal')">بستن</button></div>
+ </div>
 </div>
 
-<div id="saveSuccess" class="save-success" aria-hidden="true">
-  <div class="save-success-check">✓</div>
-  <div class="save-success-text" id="saveSuccessText">عکس فاکتور با موفقیت ذخیره شد</div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-const $ = id => document.getElementById(id);
-let persons = [];
-let invoiceCode = localStorage.getItem('foodCalcInvoiceCode') || '';
+const $=id=>document.getElementById(id);
+const EN=v=>String(v??'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+const fmt=n=>Math.round(Number(n)||0).toLocaleString('en-US');
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ds=d=>`${d[0]}/${pad(d[1])}/${pad(d[2])}`;
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 
-let editIndex = -1;
-let activeDateField = null;
+let persons=[],total=0,code='',editIdx=-1,dates={start:null,end:null},calField=null;
+try{code=localStorage.getItem('foodCalcInvoiceCode')||''}catch(e){}
 
-let startDateObj = null;
-let endDateObj = null;
+function toast(msg,type=''){const t=$('toast');t.textContent=msg;t.className='toast show '+type;clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='toast',2400)}
+function openM(id){$(id).classList.add('show')}
+function closeM(id){$(id).classList.remove('show')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
 
-function fmt(n){ return Number(Math.round(Number(n)||0)).toLocaleString('en-US'); }
-const parseMoney = v => Math.max(0, Number(String(v||'').replace(/[^0-9.]/g,'')) || 0);
-
-function getTotalExpense(){ return parseMoney(localStorage.getItem('foodCalcExpense') || '0'); }
-
-function openExpenseModal(){
-  const amount = getTotalExpense();
-  $('expenseModalInput').value = amount ? amount.toLocaleString('en-US') : '';
-  $('expenseModal').classList.add('show');$('expenseModal').setAttribute('aria-hidden','false');
-  setTimeout(() => $('expenseModalInput').focus(), 50);
+/* ---- تقویم شمسی (دقیق، بر پایه قاعده ۳۳ ساله) ---- */
+function dn(y,m,d){y+=1595;return 365*y+8*Math.floor(y/33)+Math.floor(((y%33)+3)/4)+d+(m<7?(m-1)*31:(m-7)*30+186)}
+function ml(y,m){return m<=6?31:m<=11?30:(dn(y+1,1,1)-dn(y,12,1))}
+function addM(s,k){const t=s[0]*12+(s[1]-1)+k,y=Math.floor(t/12),m=t%12+1;return[y,m,Math.min(s[2],ml(y,m))]}
+function calc(s,e){
+  const end=dn(...e)+1,totalDays=end-dn(...s);
+  if(totalDays<=0)return null;
+  let k=0;while(k<2400&&dn(...addM(s,k+1))<=end)k++;
+  return{months:k,days:end-dn(...addM(s,k)),totalDays};
+}
+function today(){
+  try{const p=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(new Date());
+    const g=t=>parseInt(p.find(x=>x.type===t).value);return[g('year'),g('month'),g('day')]}catch(e){return[1405,1,1]}
+}
+function solarNow(){
+  try{const p=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+    const g=t=>p.find(x=>x.type===t).value;return{date:`${g('year')}/${g('month')}/${g('day')}`,time:`${g('hour')}:${g('minute')}:${g('second')}`}}
+  catch(e){return{date:'',time:''}}
 }
 
-function closeExpenseModal(){
-  $('expenseModal').classList.remove('show');$('expenseModal').setAttribute('aria-hidden','true');
+/* ---- انتخاب تاریخ ---- */
+function fillDays(sel){
+  const y=parseInt(EN($('cy').value))||today()[0],m=+$('cm').value,max=ml(y,m),keep=Math.min(+$('cd').value||1,max);
+  $('cd').innerHTML=Array.from({length:max},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+  $('cd').value=sel||keep;
 }
-
-function confirmExpense(){
-  const amount = parseMoney($('expenseModalInput').value);
-  localStorage.setItem('foodCalcExpense', String(amount));
-  closeExpenseModal();
-  calculateCosts();
-  saveData();
+function openCal(f){
+  calField=f;const d=dates[f]||(f==='end'&&dates.start)||today();
+  $('cm').innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+  $('cy').value=d[0];$('cm').value=d[1];fillDays(d[2]);
+  $('calTitle').textContent=f==='start'?'تاریخ شروع حضور':'تاریخ ختم حضور';
+  openM('calModal');
 }
-
-function jalaliToDays(y, m, d){
-  let days = (y - 1400) * 365 + Math.floor((y - 1400) / 4);
-  for(let i=1; i<m; i++){
-    if(i<=6) days += 31;
-    else if(i<=11) days += 30;
-    else days += 29;
+$('cy').addEventListener('input',function(){this.value=EN(this.value).replace(/\D/g,'').slice(0,4);if(this.value.length===4)fillDays()});
+$('cm').addEventListener('change',()=>fillDays());
+function confirmCal(){
+  const y=parseInt(EN($('cy').value));
+  if(!y||y<1300||y>1600){toast('سال معتبر وارد کنید (مثلاً 1405)','err');return}
+  dates[calField]=[y,+$('cm').value,+$('cd').value];
+  showDates();closeM('calModal');
+}
+function showDates(){
+  for(const f of['start','end']){
+    $(f+'Txt').textContent=dates[f]?ds(dates[f]):'انتخاب تاریخ';
+    $(f+'Btn').classList.toggle('set',!!dates[f]);
   }
-  return days + d;
 }
 
-function calculateDaysBetween(sy, sm, sd, ey, em, ed){
-  const startDays = jalaliToDays(sy, sm, sd);
-  const endDays = jalaliToDays(ey, em, ed);
-  const diff = endDays - startDays + 1;
-  return diff > 0 ? diff : 0;
+/* ---- افراد ---- */
+function resetForm(){
+  editIdx=-1;dates={start:null,end:null};$('personName').value='';showDates();
+  $('addBtn').textContent='＋ افزودن شخص به لیست';$('formTitle').textContent='➕ افزودن شخص';$('cancelEdit').style.display='none';
+}
+function savePerson(){
+  const name=$('personName').value.trim();
+  if(!name){toast('نام شخص را وارد کنید','err');$('personName').focus();return}
+  if(!dates.start){toast('تاریخ شروع را انتخاب کنید','err');return}
+  if(!dates.end){toast('تاریخ ختم را انتخاب کنید','err');return}
+  if(!calc(dates.start,dates.end)){toast('تاریخ ختم باید بعد از شروع (یا مساوی آن) باشد','err');return}
+  const p={name,startDate:[...dates.start],endDate:[...dates.end]};
+  if(editIdx>=0){persons[editIdx]=p;toast('تغییرات ذخیره شد','ok')}else{persons.push(p);toast('شخص اضافه شد','ok')}
+  resetForm();refresh();
+}
+function editPerson(i){
+  const p=persons[i];editIdx=i;$('personName').value=p.name;dates={start:[...p.startDate],end:[...p.endDate]};showDates();
+  $('addBtn').textContent='✓ ذخیره ویرایش';$('formTitle').textContent='✏️ ویرایش شخص';$('cancelEdit').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function deletePerson(i){
+  if(!confirm('این شخص از لیست حذف شود؟'))return;
+  persons.splice(i,1);if(editIdx===i)resetForm();refresh();
 }
 
-function calculateMonthsAndDays(sy, sm, sd, ey, em, ed){
-  let totalDays = calculateDaysBetween(sy, sm, sd, ey, em, ed);
-  if(totalDays <= 0) return { months: 0, days: 0, totalDays: 0 };
-
-  let y1 = sy, m1 = sm, d1 = sd;
-  let months = 0;
-
-  while(true){
-    let daysInCurrentMonth = 31;
-    if(m1 > 6 && m1 <= 11) daysInCurrentMonth = 30;
-    else if(m1 === 12) {
-      let leap = ((y1 - 974) % 33 % 4 === 0);
-      daysInCurrentMonth = leap ? 30 : 29;
-    }
-
-    if(y1 < ey || (y1 === ey && m1 < em) || (y1 === ey && m1 === em && d1 <= ed)){
-      let nextY = m1 === 12 ? y1 + 1 : y1;
-      let nextM = m1 === 12 ? 1 : m1 + 1;
-      let nextD = d1;
-      
-      let nextDays = jalaliToDays(nextY, nextM, nextD);
-      let endTotal = jalaliToDays(ey, em, ed) + 1;
-
-      if(endTotal >= nextDays){
-        months++;
-        y1 = nextY;
-        m1 = nextM;
-        d1 = nextD;
-      } else {
-        break;
-      }
-    } else {
-      break;
-    }
+/* ---- محاسبه: مجموع سهم‌ها دقیقاً برابر کل مصارف می‌شود ---- */
+function compute(){
+  persons.forEach(p=>{const c=calc(p.startDate,p.endDate)||{months:0,days:0,totalDays:0};Object.assign(p,c)});
+  const all=persons.reduce((s,p)=>s+p.totalDays,0);
+  persons.forEach(p=>{p.rate=all&&total?total/all:0;p.share=0;p._f=0});
+  if(all&&total){
+    persons.forEach(p=>{const raw=p.totalDays*total/all;p.share=Math.floor(raw);p._f=raw-p.share});
+    let left=total-persons.reduce((s,p)=>s+p.share,0);
+    [...persons].sort((a,b)=>b._f-a._f).forEach(p=>{if(left>0){p.share++;left--}});
   }
-
-  let days = calculateDaysBetween(y1, m1, d1, ey, em, ed);
-  if(days < 0) days = 0;
-
-  return { months, days, totalDays };
+  return all;
 }
-
-function getDefaultJalaliDate(){
-  const gDate = new Date();
-  let gY = gDate.getFullYear();
-  let gM = gDate.getMonth() + 1;
-  let gD = gDate.getDate();
-  
-  let jY = gY - 621;
-  let jM = 1;
-  let jD = 1;
-  if (gM < 3 || (gM === 3 && gD < 21)) {
-    jY -= 1;
-    jM = 10;
-    jD = 10;
-  } else {
-    jM = 6;
-    jD = 27;
-  }
-  return [jY, jM, jD];
-}
-
-function openCalendar(field){
-  activeDateField = field;
-  const targetDate = field === 'start' ? startDateObj : endDateObj;
-  
-  let dObj = targetDate;
-  if(!dObj){
-    dObj = getDefaultJalaliDate();
-  }
-  
-  $('pcYearInput').value = dObj[0];$('pcMonthInput').value = dObj[1];
-  $('pcDayInput').value = dObj[2];$('pcTitleModal').textContent = field === 'start' ? 'انتخاب تاریخ شروع' : 'انتخاب تاریخ ختم';
-  $('persianCalendar').classList.add('show');
-  setTimeout(() => $('pcDayInput').focus(), 50);
-}
-
-function closeCalendar(){
-  $('persianCalendar').classList.remove('show');
-}
-
-function confirmCalendarDate(){
-  const y = parseInt($('pcYearInput').value) || 1405;
-  const m = parseInt($('pcMonthInput').value) || 1;
-  const d = parseInt($('pcDayInput').value) || 1;
-  
-  if(m < 1 || m > 12){ alert('ماه باید بین ۱ تا ۱۲ باشد.'); return; }
-  if(d < 1 || d > 31){ alert('روز باید بین ۱ تا ۳۱ باشد.'); return; }
-
-  const formattedStr = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
-
-  if(activeDateField === 'start'){
-    startDateObj = [y, m, d];
-    $('startDateText').textContent = formattedStr;
-  } else {
-    endDateObj = [y, m, d];
-    $('endDateText').textContent = formattedStr;
-  }
-  closeCalendar();
-}
-
-function addOrUpdatePerson(){
-  const name = $('personName').value.trim();
-  if(!name){ alert('لطفاً نام شخص را وارد کنید.'); $('personName').focus(); return; }
-  if(!startDateObj){ alert('لطفاً تاریخ شروع حضور را انتخاب کنید.'); return; }
-  if(!endDateObj){ alert('لطفاً تاریخ ختم حضور را انتخاب کنید.'); return; }
-
-  const calc = calculateMonthsAndDays(startDateObj[0], startDateObj[1], startDateObj[2], endDateObj[0], endDateObj[1], endDateObj[2]);
-  if(calc.totalDays <= 0){ alert('تاریخ ختم باید بعد یا مساوی تاریخ شروع باشد.'); return; }
-
-  const personObj = {
-    name,
-    startDate: [...startDateObj],
-    endDate: [...endDateObj],
-    months: calc.months,
-    days: calc.days,
-    totalDays: calc.totalDays,
-    share: 0,
-    dailyRate: 0
-  };
-
-  if(editIndex >= 0){
-    persons[editIndex] = personObj;
-    editIndex = -1;
-    $('addPersonBtn').textContent = '＋ افزودن شخص به لیست';
-  } else {
-    persons.push(personObj);
-  }
-
-  $('personName').value = '';
-  startDateObj = null; endDateObj = null;
-  $('startDateText').textContent = 'انتخاب تاریخ';
-  $('endDateText').textContent = 'انتخاب تاریخ';
-
-  calculateCosts();
-  updateInvoiceCodeButton();
-  render();
-  saveData();
-}
-
-function calculateCosts(){
-  const totalExpense = getTotalExpense();
-  const totalAllDays = persons.reduce((sum, p) => sum + p.totalDays, 0);
-
-  if(totalAllDays > 0 && totalExpense > 0){
-    const costPerDayTotal = totalExpense / totalAllDays;
-    persons.forEach(p => {
-      p.dailyRate = costPerDayTotal;
-      p.share = p.totalDays * costPerDayTotal;
-    });
-  } else {
-    persons.forEach(p => {
-      p.share = 0;
-      p.dailyRate = 0;
-    });
-  }
-  render();
-}
-
+function refresh(){render();persist()}
 function render(){
-  const tbody = $('personsRows');
-  tbody.innerHTML = '';
-  $('emptyMsg').style.display = persons.length ? 'none' : 'block';
-
-  persons.forEach((p, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="num">${fmt(i+1)}</td>
-      <td><b>${p.name}</b></td>
-      <td class="num">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
-      <td class="num">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-      <td><span class="month-badge">${fmt(p.months)} ماه</span></td>
-      <td><span class="day-badge">${fmt(p.days)} روز</span></td>
-      <td class="money">${fmt(p.dailyRate)}</td>
-      <td class="money" style="color:#d92323;">${fmt(p.share)}</td>
-      <td>
-        <button class="edit" onclick="editPerson(${i})" type="button">ویرایش</button>
-        <button class="del" onclick="deletePerson(${i})" type="button">حذف</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  $('personCount').textContent = fmt(persons.length) + ' نفر در لیست';
-  const totalExpense = getTotalExpense();
-  $('totalSummaryText').textContent = fmt(totalExpense) + ' تومان';
+  const all=compute();
+  $('rows').innerHTML=persons.map((p,i)=>`<tr>
+   <td data-l="شماره" class="ltr" style="font-weight:900;color:var(--purple)">${i+1}</td>
+   <td data-l="نام شخص" class="nm"><b>${esc(p.name)}</b></td>
+   <td data-l="تاریخ شروع" class="ltr">${ds(p.startDate)}</td>
+   <td data-l="تاریخ ختم" class="ltr">${ds(p.endDate)}</td>
+   <td data-l="تعداد ماه"><span class="badge bm">${p.months} ماه</span></td>
+   <td data-l="تعداد روز"><span class="badge bd">${p.days} روز</span></td>
+   <td data-l="سهم هر روز (تومان)" class="ltr" style="color:#0b4fb7;font-weight:900">${fmt(p.rate)}</td>
+   <td data-l="مصرف کامل (تومان)" class="ltr" style="color:var(--red);font-weight:900;font-size:20px">${fmt(p.share)}</td>
+   <td class="act"><button class="mini" style="background:var(--blue)" onclick="editPerson(${i})">ویرایش</button><button class="mini" style="background:#e22b25" onclick="deletePerson(${i})">حذف</button></td></tr>`).join('');
+  $('empty').style.display=persons.length?'none':'block';
+  $('sCount').textContent=persons.length;$('sDays').textContent=fmt(all);
+  $('sRate').textContent=fmt(all&&total?total/all:0);$('sTotal').textContent=fmt(total);
+  $('totalTxt').textContent=fmt(total)+' تومان';
+  $('codeBtn').textContent=code?'کود: '+code:'کود';$('codeBtn').classList.toggle('active',!!code);
 }
-
-window.editPerson = function(i){
-  const p = persons[i];
-  $('personName').value = p.name;
-  startDateObj = [...p.startDate];
-  endDateObj = [...p.endDate];
-  $('startDateText').textContent = `${startDateObj[0]}/${String(startDateObj[1]).padStart(2,'0')}/${String(startDateObj[2]).padStart(2,'0')}`;
-  $('endDateText').textContent = `${endDateObj[0]}/${String(endDateObj[1]).padStart(2,'0')}/${String(endDateObj[2]).padStart(2,'0')}`;
-  editIndex = i;
-  $('addPersonBtn').textContent = '✓ ذخیره ویرایش شخص';
-  window.scrollTo({top: 150, behavior: 'smooth'});
-};
-
-window.deletePerson = function(i){
-  if(confirm('این شخص از لیست حذف شود؟')){
-    persons.splice(i, 1);
-    calculateCosts();
-    render();
-    saveData();
-  }
-};
-
-function clearAllData(){
-  if(confirm('تمام اطلاعات، افراد و هزینه‌ها پاک شوند؟')){
-    persons = [];
-    localStorage.removeItem('foodCalcExpense');
-    $('notesInput').value = '';
-    startDateObj = null; endDateObj = null;
-    $('startDateText').textContent = 'انتخاب تاریخ';
-    $('endDateText').textContent = 'انتخاب تاریخ';
-    localStorage.removeItem('foodCalcData5');
-    render();
-    calculateCosts();
-  }
-}
-
-function handleNotesInput(){
-  saveData();
-}
-
-function saveData(){
-  const data = {
-    totalExpense: getTotalExpense(),
-    notes: $('notesInput').value,
-    persons
-  };
-  localStorage.setItem('foodCalcData5', JSON.stringify(data));
-}
-
+function persist(){lsSet('foodCalcData5',{totalExpense:total,notes:$('notes').value,persons})}
 function loadData(){
-  try{
-    const saved = JSON.parse(localStorage.getItem('foodCalcData5') || '{}');
-    if(saved.totalExpense !== undefined) localStorage.setItem('foodCalcExpense', String(parseMoney(saved.totalExpense)));
-    if(saved.notes !== undefined) $('notesInput').value = saved.notes;
-    if(Array.isArray(saved.persons)) {
-      persons = saved.persons.map(p => {
-        if(p.months === undefined || p.totalDays === undefined){
-          let calc = calculateMonthsAndDays(p.startDate[0], p.startDate[1], p.startDate[2], p.endDate[0], p.endDate[1], p.endDate[2]);
-          p.months = calc.months;
-          p.days = calc.days;
-          p.totalDays = calc.totalDays;
-        }
-        return p;
-      });
-    }
-  }catch(e){ persons = []; }
-  calculateCosts();
+  const s=lsGet('foodCalcData5',{});
+  total=Math.max(0,parseInt(s.totalExpense)||0);$('notes').value=s.notes||'';
+  persons=Array.isArray(s.persons)?s.persons.filter(p=>p&&p.startDate&&p.endDate):[];
+  render();
+}
+function clearAll(){
+  if(!confirm('تمام افراد، مبلغ کل و توضیحات پاک شوند؟'))return;
+  persons=[];total=0;$('notes').value='';resetForm();refresh();toast('همه چیز پاک شد');
 }
 
-function buildCaptureHTML(){
-  const totalExpenseStr = fmt(getTotalExpense());
-  
-  let rawNotes = $('notesInput').value.trim();
-  if(rawNotes.endsWith('✅')) {
-    rawNotes = rawNotes.replace(/✅$/, '').trim();
-  }
-  
-  const notesText = rawNotes ? rawNotes + ' ✅' : '✅';
-  const notes = notesText.replace(/\n/g, '<br>');
-
-  const codeTitle = invoiceCode ? `<div style="text-align:center;margin:-2px 0 12px;font-size:26px;font-weight:1000;color:#16885b;direction:rtl;">کود: <span dir="ltr">${toEnglishDigits(invoiceCode)}</span></div>` : '';
-
-  let html = `
-    <div class="capture-title">محاسبه اشتراک مصارف</div>
-    ${codeTitle}
-    <table class="capture-table">
-      <thead>
-        <tr style="background:#7040c7; color:#fff;">
-          <th style="width:70px;">شماره</th>
-          <th>نام شخص</th>
-          <th>تاریخ شروع</th>
-          <th>تاریخ ختم</th>
-          <th style="background:#d63384;">تعداد ماه</th>
-          <th style="background:#198754;">تعداد روز</th>
-          <th>سهم هر روز (تومان)</th>
-          <th>جمع سهم شخص (تومان)</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  persons.forEach((p, i) => {
-    html += `
-      <tr>
-        <td style="text-align:center;font-weight:1000">${fmt(i+1)}</td>
-        <td style="font-weight:1000">${p.name}</td>
-        <td style="direction:ltr; text-align:center;">${p.startDate[0]}/${String(p.startDate[1]).padStart(2,'0')}/${String(p.startDate[2]).padStart(2,'0')}</td>
-        <td style="direction:ltr; text-align:center;">${p.endDate[0]}/${String(p.endDate[1]).padStart(2,'0')}/${String(p.endDate[2]).padStart(2,'0')}</td>
-        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;height:42px;padding:0 10px;background:#fce8f3;border:2px solid #d63384;border-radius:21px;color:#b02a6b;font-weight:1000;font-size:15px;">${fmt(p.months)} ماه</span></td>
-        <td style="text-align:center;"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;height:42px;padding:0 10px;background:#e8f8f0;border:2px solid #198754;border-radius:21px;color:#146c43;font-weight:1000;font-size:15px;">${fmt(p.days)} روز</span></td>
-        <td class="money" style="color:#0b4fb7">${fmt(p.dailyRate)}</td>
-        <td class="money" style="color:#d92323; font-weight:1000">${fmt(p.share)}</td>
-      </tr>
-    `;
-  });
-
-  html += `
-      </tbody>
-    </table>
-    
-    <div class="capture-total">
-      مجموع کل مصارف: ${totalExpenseStr} تومان
-    </div>
-
-    <div class="capture-footer">
-      <b>توضیحات:</b><br>${notes}
-    </div>
-  `;
-
-  $('capture').innerHTML = html;
+/* ---- مبلغ کل و کود ---- */
+function openExpense(){$('expInput').value=total?total.toLocaleString('en-US'):'';openM('expModal');setTimeout(()=>$('expInput').focus(),80)}
+$('expInput').addEventListener('input',function(){const n=parseInt(EN(this.value).replace(/\D/g,''))||0;this.value=n?n.toLocaleString('en-US'):''});
+function confirmExpense(){total=parseInt(EN($('expInput').value).replace(/\D/g,''))||0;closeM('expModal');refresh();toast('مبلغ کل ثبت شد','ok')}
+function openCode(){$('codeInput').value=code;openM('codeModal');setTimeout(()=>{$('codeInput').focus();$('codeInput').select()},80)}
+$('codeInput').addEventListener('input',function(){this.value=EN(this.value).replace(/\D/g,'').slice(0,3)});
+function confirmCode(){
+  const c=EN($('codeInput').value).replace(/\D/g,'');
+  if(c&&c.length!==3){toast('کود باید دقیقاً سه رقم باشد','err');return}
+  code=c;try{c?localStorage.setItem('foodCalcInvoiceCode',c):localStorage.removeItem('foodCalcInvoiceCode')}catch(e){}
+  closeM('codeModal');render();
 }
 
-function toEnglishDigits(value){
-  return String(value ?? '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+/* ---- ثبت و بازیابی فاکتور ---- */
+const getInv=()=>lsGet('foodCalcInvoices',[]);
+const clone=o=>JSON.parse(JSON.stringify(o));
+function newRecord(data){
+  const n=new Date(),s=solarNow(),c=/^\d{3}$/.test(data.code||'')?data.code:'';
+  return{id:'inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),title:'حساب گر'+(c?' '+c:''),
+    savedAt:`${n.getFullYear()}-${pad(n.getMonth()+1)}-${pad(n.getDate())}_${pad(n.getHours())}-${pad(n.getMinutes())}`,
+    savedAtSolarDate:s.date,savedAtSolarTime:s.time,data};
+}
+function saveInvoice(){
+  if(!persons.length){toast('ابتدا حداقل یک شخص اضافه کنید','err');return}
+  const list=getInv();list.unshift(newRecord(clone({totalExpense:total,notes:$('notes').value,code,persons})));
+  lsSet('foodCalcInvoices',list);toast('فاکتور در مرورگر ثبت شد ✓','ok');
+}
+function openInvoices(){renderInv();openM('invModal')}
+function renderInv(){
+  const list=getInv();
+  $('invList').innerHTML=list.length?list.map((v,i)=>`<div class="inv"><b>${i+1}. ${esc(v.title)}</b>
+   <small>${esc(v.savedAtSolarDate||v.savedAt||'')} ${v.savedAtSolarTime?'· '+esc(v.savedAtSolarTime):''}</small>
+   <div style="font-size:16px;color:var(--mute);margin:4px 0 8px">${(v.data&&v.data.persons||[]).length} نفر · ${fmt(v.data&&v.data.totalExpense)} تومان</div>
+   <button class="mini" style="background:var(--blue)" onclick="openInv('${v.id}')">باز کردن</button>
+   <button class="mini" style="background:#198754" onclick="photoInv('${v.id}')">عکس</button>
+   <button class="mini" style="background:var(--orange)" onclick="exportInv('${v.id}')">کپی فایل</button>
+   <button class="mini" style="background:#e22b25" onclick="delInv('${v.id}')">حذف</button></div>`).join(''):'<div class="empty">هنوز فاکتوری ثبت نشده است.</div>';
+}
+function applyData(d){
+  if(!d||!Array.isArray(d.persons)){toast('فایل فاکتور معتبر نیست','err');return false}
+  persons=clone(d.persons).filter(p=>p&&p.startDate&&p.endDate);total=Math.max(0,parseInt(d.totalExpense)||0);
+  code=/^\d{3}$/.test(d.code||'')?d.code:'';try{localStorage.setItem('foodCalcInvoiceCode',code)}catch(e){}
+  $('notes').value=d.notes||'';resetForm();refresh();return true;
+}
+const findInv=id=>getInv().find(x=>x.id===id);
+function openInv(id){const v=findInv(id);if(v&&applyData(v.data)){closeM('invModal');toast('فاکتور باز شد و قابل ویرایش است','ok')}}
+function photoInv(id){const v=findInv(id);if(v&&applyData(v.data)){closeM('invModal');setTimeout(exportImage,150)}}
+function delInv(id){if(!confirm('این فاکتور حذف شود؟'))return;lsSet('foodCalcInvoices',getInv().filter(x=>x.id!==id));renderInv()}
+function exportInv(id){
+  const v=findInv(id);if(!v)return;const c=/^\d{3}$/.test(v.data.code||'')?' '+v.data.code:'';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(v,null,2)],{type:'application/json'}));
+  a.download=`حساب گر${c}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+function importInvoice(ev){
+  const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const o=JSON.parse(r.result),d=o.data||o;if(!d||!Array.isArray(d.persons))throw 0;
+    const list=getInv();list.unshift(newRecord(d));lsSet('foodCalcInvoices',list);renderInv();toast('کپی فاکتور وارد شد ✓','ok');
+  }catch(e){toast('فایل انتخاب‌شده معتبر نیست','err')}ev.target.value=''};
+  r.readAsText(f);
 }
 
-function setInvoiceCode(){
-  const input = $('invoiceCodeInput');
-  input.value = toEnglishDigits(invoiceCode || '');
-  $('codeModal').classList.add('show');$('codeModal').setAttribute('aria-hidden','false');
-  setTimeout(() => { input.focus(); input.select(); }, 50);
-}
-
-function closeCodeModal(){
-  $('codeModal').classList.remove('show');$('codeModal').setAttribute('aria-hidden','true');
-}
-
-function confirmInvoiceCode(){
-  const input = $('invoiceCodeInput');
-  const code = toEnglishDigits(input.value).replace(/\D/g,'');
-  if(code === ''){
-    invoiceCode = '';
-    localStorage.removeItem('foodCalcInvoiceCode');
-    updateInvoiceCodeButton();
-    closeCodeModal();
-    return;
-  }
-  if(!/^\d{3}$/.test(code)){
-    alert('کود باید دقیقاً سه رقم انگلیسی باشد؛ مثلاً 123.');
-    input.focus();
-    return;
-  }
-  invoiceCode = code;
-  localStorage.setItem('foodCalcInvoiceCode', invoiceCode);
-  updateInvoiceCodeButton();
-  closeCodeModal();
-}
-
-function updateInvoiceCodeButton(){
-  const btn=$('invoiceCodeBtn');
-  if(!btn) return;
-  btn.textContent=invoiceCode ? 'کود: '+invoiceCode : 'کود';
-  btn.classList.toggle('active', !!invoiceCode);
-}
-
-function getCurrentInvoiceData(){
-  return JSON.parse(JSON.stringify({
-    totalExpense: getTotalExpense(),
-    notes: $('notesInput').value,
-    code: invoiceCode || '',
-    persons: persons
-  }));
-}
-
-function getSavedInvoices(){
-  try { return JSON.parse(localStorage.getItem('foodCalcInvoices') || '[]'); }
-  catch(e){ return []; }
-}
-
-function getEnglishDateTime(date = new Date()){
-  const pad = n => String(n).padStart(2,'0');
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}-${pad(date.getSeconds())}`;
-}
-
-function saveInvoiceRecord(){
-  if(!persons.length){ alert('ابتدا حداقل یک شخص به لیست اضافه کنید.'); return; }
-  const invoices = getSavedInvoices();
-  const now = new Date();
-  const solarNow = getSolarDateTime(now);
-  const record = {
-    id: 'inv_' + Date.now(),
-    title: 'حساب گر' + (invoiceCode ? ' ' + invoiceCode : ''),
-    savedAt: getEnglishDateTime(now),
-    savedAtSolarDate: solarNow.date,
-    savedAtSolarTime: solarNow.time,
-    data: getCurrentInvoiceData()
-  };
-  invoices.unshift(record);
-  localStorage.setItem('foodCalcInvoices', JSON.stringify(invoices));
-  alert('فاکتور با موفقیت در مرورگر ثبت شد.');
-}
-
-function openInvoiceManager(){
-  renderInvoiceList();
-  $('invoiceManager').classList.add('show');$('invoiceManager').setAttribute('aria-hidden','false');
-}
-
-function closeInvoiceManager(){
-  $('invoiceManager').classList.remove('show');$('invoiceManager').setAttribute('aria-hidden','true');
-}
-
-function renderInvoiceList(){
-  const box = $('invoiceList');
-  const invoices = getSavedInvoices();
-  if(!invoices.length){
-    box.innerHTML = '<div class="empty">هنوز هیچ فاکتوری ثبت نشده است.</div>';
-    return;
-  }
-  box.innerHTML = invoices.map((inv, i) => {
-    const count = inv.data && Array.isArray(inv.data.persons) ? inv.data.persons.length : 0;
-    return `<div class="invoice-item">
-      <div class="invoice-item-title">${i+1}. ${escapeHtml(inv.title || 'حساب گر')}<div class="invoice-datetime">${recordDateTimeHtml(inv)}</div></div>
-      <div style="margin-bottom:8px;font-size:13px;color:#4b5563;">${count} نفر</div>
-      <div class="invoice-item-actions">
-        <button class="invoice-open" onclick="loadInvoiceRecord('${inv.id}')">باز کردن</button>
-        <button class="invoice-export" onclick="exportInvoiceFile('${inv.id}')">گرفتن کپی فایل</button>
-        <button class="invoice-delete" onclick="deleteInvoiceRecord('${inv.id}')">حذف</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function escapeHtml(v){
-  return String(v == null ? '' : v).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-}
-
-function findInvoice(id){ return getSavedInvoices().find(x => x.id === id); }
-
-function loadInvoiceData(data){
-  if(!data || !Array.isArray(data.persons)){ alert('فایل فاکتور معتبر نیست.'); return false; }
-  persons = JSON.parse(JSON.stringify(data.persons));
-  persons.forEach(p => {
-    if(p.months === undefined || p.totalDays === undefined){
-      const c = calculateMonthsAndDays(p.startDate[0],p.startDate[1],p.startDate[2],p.endDate[0],p.endDate[1],p.endDate[2]);
-      p.months=c.months; p.days=c.days; p.totalDays=c.totalDays;
-    }
-  });
-  localStorage.setItem('foodCalcExpense', String(parseMoney(data.totalExpense)));
-  invoiceCode = /^\d{3}$/.test(String(data.code || '')) ? String(data.code) : '';
-  localStorage.setItem('foodCalcInvoiceCode', invoiceCode);
-  updateInvoiceCodeButton();
-  $('notesInput').value = data.notes || '';
-  startDateObj=null; endDateObj=null; editIndex=-1;
-  $('personName').value=''; $('startDateText').textContent='انتخاب تاریخ'; $('endDateText').textContent='انتخاب تاریخ';
-  $('addPersonBtn').textContent='＋ افزودن شخص به لیست';
-  calculateCosts(); render(); saveData();
-  return true;
-}
-
-function loadInvoiceRecord(id){
-  const inv=findInvoice(id); if(!inv) return;
-  if(loadInvoiceData(inv.data)){ closeInvoiceManager(); alert('فاکتور باز شد و قابل ویرایش است.'); }
-}
-
-function copyInvoiceRecord(id){
-  const inv=findInvoice(id); if(!inv) return;
-  const invoices=getSavedInvoices();
-  const copy=JSON.parse(JSON.stringify(inv));
-  copy.id='inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-  const copyDate = new Date();
-  const copySolar = getSolarDateTime(copyDate);
-  const copyCode = (copy.data && /^\d{3}$/.test(String(copy.data.code || ''))) ? String(copy.data.code) : '';
-  copy.title = 'حساب گر' + (copyCode ? ' ' + copyCode : '');
-  copy.savedAt = getEnglishDateTime(copyDate);
-  copy.savedAtSolarDate = copySolar.date;
-  copy.savedAtSolarTime = copySolar.time;
-  invoices.unshift(copy);
-  localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
-  renderInvoiceList();
-}
-
-function photoInvoiceRecord(id){
-  const inv=findInvoice(id); if(!inv) return;
-  if(!loadInvoiceData(inv.data)) return;
-  closeInvoiceManager();
-  setTimeout(exportImage,100);
-}
-
-function deleteInvoiceRecord(id){
-  if(!confirm('این فاکتور ثبت‌شده حذف شود؟')) return;
-  const invoices=getSavedInvoices().filter(x=>x.id!==id);
-  localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
-  renderInvoiceList();
-}
-
-function getSolarDateTime(dateObj = new Date()){
-  const parts = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
-    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
-  }).formatToParts(dateObj);
-  const get = type => parts.find(x => x.type === type)?.value || '';
-  const y = toEnglishDigits(get('year')).padStart(4,'0');
-  const m = toEnglishDigits(get('month')).padStart(2,'0');
-  const d = toEnglishDigits(get('day')).padStart(2,'0');
-  const h = toEnglishDigits(get('hour')).padStart(2,'0');
-  const min = toEnglishDigits(get('minute')).padStart(2,'0');
-  const sec = toEnglishDigits(get('second')).padStart(2,'0');
-  return { date:`${y}/${m}/${d}`, time:`${h}:${min}:${sec}` };
-}
-
-function recordDateTimeHtml(inv){
-  if(inv.savedAtSolarDate || inv.savedAtSolarTime){
-    return `<span class="invoice-date">${escapeHtml(inv.savedAtSolarDate || '')}</span><span class="invoice-time">ساعت ${escapeHtml(inv.savedAtSolarTime || '')}</span>`;
-  }
-  return `<span class="invoice-date">${escapeHtml(inv.savedAt || '')}</span>`;
-}
-
-function exportInvoiceFile(id){
-  const inv=findInvoice(id); if(!inv) return;
-  const code = (inv.data && /^\d{3}$/.test(String(inv.data.code||''))) ? String(inv.data.code) : '';
-  const codePart = code ? ` ${code}` : '';
-  const fileName = `حساب گر${codePart}.json`;
-  const exportRecord = JSON.parse(JSON.stringify(inv));
-  exportRecord.copiedAt = new Date().toISOString();
-  exportRecord.fileName = fileName;
-  const blob=new Blob([JSON.stringify(exportRecord,null,2)],{type:'application/json;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=fileName;
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-
-function importInvoiceFile(event){
-  const file=event.target.files && event.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=function(){
-    try{
-      const obj=JSON.parse(reader.result);
-      const data=obj.data || obj;
-      if(!data || !Array.isArray(data.persons)) throw new Error('invalid');
-      const invoices=getSavedInvoices();
-      const importedCode = /^\d{3}$/.test(String(data.code || '')) ? String(data.code) : '';
-      const importNow = new Date();
-      const importSolar = getSolarDateTime(importNow);
-      const rec={
-        id:'inv_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-        title: 'حساب گر' + (importedCode ? ' ' + importedCode : ''),
-        savedAt:getEnglishDateTime(importNow),
-        savedAtSolarDate: importSolar.date,
-        savedAtSolarTime: importSolar.time,
-        data:data
-      };
-      invoices.unshift(rec);
-      localStorage.setItem('foodCalcInvoices',JSON.stringify(invoices));
-      event.target.value='';
-      renderInvoiceList();
-      alert('کپی فاکتور با موفقیت وارد شد.');
-    }catch(e){ alert('فایل انتخاب‌شده فاکتور معتبر نیست.'); }
-  };
-  reader.readAsText(file);
-}
-
+/* ---- عکس فاکتور ---- */
 function exportImage(){
-  if(!persons.length){ alert('ابتدا حداقل یک شخص به لیست اضافه کنید.'); return; }
-  buildCaptureHTML();
-
-  html2canvas($('capture'), {scale: 2.5, useCORS: true, backgroundColor: '#fff', logging: false}).then(canvas => {
-    const a = document.createElement('a');
-    a.download = 'expense-invoice-' + Date.now() + '.png';
-    a.href = canvas.toDataURL('image/png', 1.0);
-    a.click();
-
-    const success = $('saveSuccess');
-    success.classList.add('show');
-    success.setAttribute('aria-hidden', 'false');
-    setTimeout(() => {
-      success.classList.remove('show');
-      success.setAttribute('aria-hidden', 'true');
-    }, 1800);
-  }).catch(err => {
-    console.error(err);
-    alert('خطا در ذخیره عکس فاکتور.');
-  });
+  if(!persons.length){toast('ابتدا حداقل یک شخص اضافه کنید','err');return}
+  if(typeof html2canvas==='undefined'){toast('برای ساخت عکس به اینترنت نیاز است','err');return}
+  compute();
+  const note=($('notes').value.trim().replace(/✅$/,'').trim()+' ✅').trim();
+  const cell=(l,v,c)=>`<div style="flex:1;text-align:center;padding:10px 4px;border-left:2px solid #e3eaf6"><div style="font-size:21px;color:#5b6577;font-weight:700">${l}</div><div style="font-size:30px;font-weight:900;color:${c};direction:ltr;unicode-bidi:plaintext;margin-top:2px">${v}</div></div>`;
+  const big=(l,v,c,bg,bc)=>`<div style="flex:1;text-align:center;padding:14px 6px;background:${bg};border:3px solid ${bc};border-radius:20px"><div style="font-size:24px;font-weight:900;color:${c}">${l}</div><div style="font-size:38px;font-weight:900;color:${c};direction:ltr;unicode-bidi:plaintext;line-height:1.35">${v}</div><div style="font-size:20px;color:${c};font-weight:700">تومان</div></div>`;
+  $('capture').innerHTML=`
+   <div style="text-align:center;font-size:50px;font-weight:900;color:#d92323;line-height:1.4">محاسبه اشتراک مصارف</div>
+   ${code?`<div style="text-align:center;font-size:30px;font-weight:900;color:#16885b;margin-bottom:6px">کود: <span dir="ltr">${code}</span></div>`:''}
+   ${persons.map((p,i)=>`
+    <div style="margin-top:18px;border:3px solid #cdd9f0;border-radius:24px;background:#fff;overflow:hidden">
+     <div style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#6d3fc4,#d63384);color:#fff;padding:12px 18px">
+      <span style="min-width:46px;height:46px;border-radius:50%;background:#fff;color:#6d3fc4;font-size:28px;font-weight:900;display:inline-flex;align-items:center;justify-content:center">${i+1}</span>
+      <span style="font-size:34px;font-weight:900">${esc(p.name)}</span>
+     </div>
+     <div style="display:flex;border-bottom:2px solid #e3eaf6">${cell('تاریخ شروع',ds(p.startDate),'#1769e0')}${cell('تاریخ ختم',ds(p.endDate),'#f08000')}${cell('ماه',p.months,'#d63384')}${cell('روز',p.days,'#16885b')}</div>
+     <div style="display:flex;gap:12px;padding:14px">${big('سهم هر روز',fmt(p.rate),'#0b4fb7','#eaf2ff','#1769e0')}${big('مصرف کامل',fmt(p.share),'#a40000','#fff0f0','#e22b25')}</div>
+    </div>`).join('')}
+   <div style="margin-top:22px;border:5px solid #e32b22;border-radius:24px;background:#ffd12b;text-align:center;padding:16px"><div style="font-size:26px;font-weight:900;color:#8e1710">مجموع کل مصارف</div><div style="font-size:46px;font-weight:900;color:#9d0808;direction:ltr;unicode-bidi:plaintext;line-height:1.4">${fmt(total)} تومان</div></div>
+   <div style="margin-top:18px;border:4px solid #16885b;border-radius:22px;background:#fff;padding:16px 18px;font-size:27px;line-height:1.8;font-weight:900"><b>توضیحات:</b><br>${esc(note).replace(/\n/g,'<br>')}</div>`;
+  const go=()=>html2canvas($('capture'),{scale:2.5,useCORS:true,backgroundColor:'#fff',logging:false}).then(cv=>{
+    const a=document.createElement('a');a.download='expense-invoice-'+Date.now()+'.png';a.href=cv.toDataURL('image/png');a.click();
+    toast('عکس فاکتور با موفقیت ذخیره شد ✓','ok');
+  }).catch(()=>toast('خطا در ساخت عکس فاکتور','err'));
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(go);
 }
 
 loadData();
-updateInvoiceCodeButton();
-$('expenseModalInput').addEventListener('input', function(){
-  const raw = parseMoney(this.value);
-  this.value = raw ? raw.toLocaleString('en-US') : '';
-});
-
-$('invoiceCodeInput').addEventListener('input', function(){
-  this.value = toEnglishDigits(this.value).replace(/\D/g,'').slice(0,3);
-});
 </script>
 </body>
 </html>
